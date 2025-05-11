@@ -9,8 +9,8 @@ public class Note {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
-    private String text;
-    private int priority;
+    private final String text;
+    private final int priority;
 
 
 

@@ -38,12 +38,7 @@ public class AddNoteActivity extends AppCompatActivity {
         noteDatabase = NoteDatabase.getInstance(getApplication());
 
         initViews();
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                saveNote();
-            }
-        });
+        saveButton.setOnClickListener(view -> saveNote());
     }
 
     private void initViews() {
