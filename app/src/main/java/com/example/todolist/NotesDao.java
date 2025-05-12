@@ -9,7 +9,7 @@ import java.util.List;
 
 @Dao
 public interface NotesDao {
-    @Query("SELECT * FROM notes")
+    @Query("SELECT * FROM notes ORDER BY priority DESC")
     List<Note> getNotes();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
