@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,19 +26,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-        noteDatabase = NoteDatabase.getInstance(getApplication());
         initViews();
-        notesAdapter = new NotesAdapter();
-        notesAdapter.setOnNoteClickListener(note -> {
-        });
 
+        noteDatabase = NoteDatabase.getInstance(getApplication());
+        notesAdapter = new NotesAdapter();
+        /*notesAdapter.setOnNoteClickListener(note -> {
+        });*/
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(
                 new ItemTouchHelper.SimpleCallback(
                         0,
@@ -58,9 +52,11 @@ public class MainActivity extends AppCompatActivity {
                         Note note = notesAdapter.getNotes().get(position);
                         noteDatabase.notesDao().remove(note.getId());
                         showNotes();
+                        onNoteDeleted(note);
                     }
                 });
         itemTouchHelper.attachToRecyclerView(recyclerViewNotes);
+
 
         recyclerViewNotes.setAdapter(notesAdapter);
 
@@ -77,11 +73,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
         buttonAddNote = findViewById(R.id.buttonAddNote);
         recyclerViewNotes = findViewById(R.id.recyclerViewNotes);
     }
 
     private void showNotes() {
         notesAdapter.setNotes(noteDatabase.notesDao().getNotes());
+    }
+
+    private void onNoteDeleted(Note note) {
+        Snackbar.make(buttonAddNote, "Note deleted", Snackbar.LENGTH_LONG)
+                .setAction("Undo", v -> {
+                    noteDatabase.notesDao().add(note);
+                    showNotes();
+                })
+                .show();
     }
 }

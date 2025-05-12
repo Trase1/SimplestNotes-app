@@ -3,7 +3,6 @@ package com.example.todolist;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -28,6 +27,13 @@ public class AddNoteActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initViews();
+
+        noteDatabase = NoteDatabase.getInstance(getApplication());
+        saveButton.setOnClickListener(view -> saveNote());
+    }
+
+    private void initViews() {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_add_note);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -35,13 +41,6 @@ public class AddNoteActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        noteDatabase = NoteDatabase.getInstance(getApplication());
-
-        initViews();
-        saveButton.setOnClickListener(view -> saveNote());
-    }
-
-    private void initViews() {
         editTextNote = findViewById(R.id.editTextNote);
         radioButtonLow = findViewById(R.id.radioButtonLow);
         radioButtonMedium = findViewById(R.id.radioButtonMedium);
