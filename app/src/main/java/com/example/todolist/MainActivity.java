@@ -2,6 +2,8 @@ package com.example.todolist;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -14,26 +16,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     private FloatingActionButton buttonAddNote;
     private RecyclerView recyclerViewNotes;
     private NotesAdapter notesAdapter;
-
     private NoteDatabase noteDatabase;
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-        noteDatabase = NoteDatabase.getInstance(getApplication());
         initViews();
+
+        noteDatabase = NoteDatabase.getInstance(getApplication());
         notesAdapter = new NotesAdapter();
         notesAdapter.setOnNoteClickListener(note -> {
         });
@@ -56,8 +54,11 @@ public class MainActivity extends AppCompatActivity {
                                          int direction) {
                         int position = viewHolder.getAdapterPosition();
                         Note note = notesAdapter.getNotes().get(position);
-                        noteDatabase.notesDao().remove(note.getId());
-                        showNotes();
+                        new Thread(() -> {
+                            noteDatabase.notesDao().remove(note.getId());
+                            handler.post(() -> showNotes());
+                        }).start();
+
                     }
                 });
         itemTouchHelper.attachToRecyclerView(recyclerViewNotes);
@@ -77,11 +78,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
         buttonAddNote = findViewById(R.id.buttonAddNote);
         recyclerViewNotes = findViewById(R.id.recyclerViewNotes);
     }
 
     private void showNotes() {
-        notesAdapter.setNotes(noteDatabase.notesDao().getNotes());
+        new Thread(() -> {
+            List<Note> notes = noteDatabase.notesDao().getNotes();
+            handler.post(() -> notesAdapter.setNotes(notes));
+        }).start();
     }
 }
