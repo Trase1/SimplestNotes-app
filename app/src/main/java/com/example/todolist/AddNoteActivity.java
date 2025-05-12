@@ -3,7 +3,8 @@ package com.example.todolist;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -21,6 +22,7 @@ public class AddNoteActivity extends AppCompatActivity {
     private RadioButton radioButtonLow;
     private RadioButton radioButtonMedium;
     private Button saveButton;
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     //private final Database database = Database.getInstance();
     private NoteDatabase noteDatabase;
@@ -28,6 +30,12 @@ public class AddNoteActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initViews();
+        noteDatabase = NoteDatabase.getInstance(getApplication());
+        saveButton.setOnClickListener(view -> saveNote());
+    }
+
+    private void initViews() {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_add_note);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -35,13 +43,6 @@ public class AddNoteActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        noteDatabase = NoteDatabase.getInstance(getApplication());
-
-        initViews();
-        saveButton.setOnClickListener(view -> saveNote());
-    }
-
-    private void initViews() {
         editTextNote = findViewById(R.id.editTextNote);
         radioButtonLow = findViewById(R.id.radioButtonLow);
         radioButtonMedium = findViewById(R.id.radioButtonMedium);
@@ -55,8 +56,10 @@ public class AddNoteActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.empty_noat_toast, Toast.LENGTH_SHORT).show();
         } else {
             Note note = new Note(text, priority);
-            noteDatabase.notesDao().add(note);
-            finish();
+            new Thread(() -> {
+                noteDatabase.notesDao().add(note);
+                handler.post(this::finish);
+            }).start();
         }
     }
 
