@@ -1,6 +1,7 @@
 package com.example.todolist;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -15,7 +16,10 @@ public interface NotesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void add(Note note);
 
-    @Query("DELETE FROM notes WHERE id = :id")
-    void remove(int id);
+    /*@Query("DELETE FROM notes WHERE id = :id")
+    void remove(int id);*/
+
+    @Delete
+    void remove(Note note);
 
 }

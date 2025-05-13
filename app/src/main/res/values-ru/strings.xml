@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TodoList</string>
+    <string name="enter_note">Введите заметку:</string>
+    <string name="low">Низкий</string>
+    <string name="medium">Средний</string>
+    <string name="high">Высокий</string>
+    <string name="save">Сохранить</string>
+    <string name="empty_note_toast">Пожалуйста, введите текст заметки</string>
+    <string name="error_loading_notes">Не удалось загрузить заметки</string>
+    <string name="note_deleted">Заметка удалена</string>
+    <string name="undo">Отменить</string>
+    <string name="error_adding_a_note">Не удалось добавить заметку</string>
+    <string name="note_added">Заметка добавлена</string>
+    <string name="add_new_note_button_label">Добавить новую заметку\n</string>
+</resources>

@@ -32,6 +32,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/editTextNote"
+
         >
 
         <RadioButton
@@ -40,11 +41,12 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:checked="true"
-            android:background="@android:color/holo_green_light"
+            android:background="@drawable/low_radio_button_background"
             android:textColor="@color/white"
             android:padding="8dp"
             android:text="@string/low"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            />
 
         <RadioButton
             android:id="@+id/radioButtonMedium"
@@ -62,7 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@android:color/holo_red_light"
+            android:background="@drawable/high_radio_button_background"
             android:textColor="@color/white"
             android:padding="8dp"
             android:text="@string/high"
@@ -77,6 +79,7 @@
         android:layout_margin="16dp"
         android:textAllCaps="true"
         android:text="@string/save"
+        android:background="@drawable/note_background"
         app:layout_constraintTop_toBottomOf="@+id/radioGroup"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

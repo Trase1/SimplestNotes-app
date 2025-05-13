@@ -1,6 +1,8 @@
 package com.example.todolist;
 
 import android.annotation.SuppressLint;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,14 +39,16 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
         Note note = notes.get(position);
         notesViewHolder.textViewNote.setText(note.getText());
 
-        int colorResId;
-        switch (note.getPriority()) {
-            case 0 : colorResId = android.R.color.holo_green_light; break;
-            case 1 : colorResId =  android.R.color.holo_orange_light; break;
-            default: colorResId =  android.R.color.holo_red_light;
-        }
+        int colorResId = note.getColorResId();
+        Drawable drawable = ContextCompat.getDrawable(notesViewHolder.itemView.getContext(), R.drawable.note_background);
         int color = ContextCompat.getColor(notesViewHolder.itemView.getContext(), colorResId);
-        notesViewHolder.textViewNote.setBackgroundColor(color);
+        if (drawable instanceof GradientDrawable) {
+            ((GradientDrawable) drawable).setColor(color);
+            notesViewHolder.textViewNote.setBackground(drawable);
+        }
+        /*
+        notesViewHolder.textViewNote.setBackgroundColor(color);*/
+
         notesViewHolder.itemView.setOnClickListener(view -> {
             if (onNoteClickListener != null) {
                 onNoteClickListener.onNoteClick(note);
@@ -75,7 +79,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
             textViewNote = itemView.findViewById(R.id.textViewNote);
         }
     }
-
+    @FunctionalInterface
     public interface OnNoteClickListener {
         void onNoteClick(Note note);
     }
