@@ -2,8 +2,7 @@ package com.example.todolist;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -18,6 +17,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,14 +26,66 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerViewNotes;
     private NotesAdapter notesAdapter;
     private NoteDatabase noteDatabase;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setupEdgeToEdge();
         initViews();
+        setupDatabase();
+        setupRecyclerView();
+        setupOnClickListeners();
+    }
 
-        noteDatabase = NoteDatabase.getInstance(getApplication());
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showNotes();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        executor.shutdown();
+    }
+    private void showNotes() {
+        executor.execute(() -> {
+            try {
+                List<Note> notes = noteDatabase.notesDao().getNotes();
+                runOnUiThread(() -> notesAdapter.setNotes(notes));
+            } catch (Exception e) {
+                runOnUiThread(() ->
+                        Toast.makeText(this, R.string.error_loading_notes, Toast.LENGTH_SHORT).show());
+            }
+        });
+    }
+
+    private void deleteNote(Note note) {
+        executor.execute(() -> {
+            try {
+                noteDatabase.notesDao().remove(note/*.getId()*/);
+                runOnUiThread(() -> showUndoSnackbar(note));
+                showNotes();
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(this, R.string.error_loading_notes, Toast.LENGTH_SHORT).show());
+            }
+        });
+    }
+
+    private void undoDelete(Note note) {
+        executor.execute(() -> {
+            noteDatabase.notesDao().add(note);
+            showNotes();
+        });
+    }
+    private void setupOnClickListeners() {
+        buttonAddNote.setOnClickListener(view -> {
+            Intent intent = AddNoteActivity.newIntent(this);
+            startActivity(intent);
+        });
+    }
+    private void setupRecyclerView() {
         notesAdapter = new NotesAdapter();
         /*notesAdapter.setOnNoteClickListener(note -> {
         });*/
@@ -53,35 +106,20 @@ public class MainActivity extends AppCompatActivity {
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder,
                                          int direction) {
                         int position = viewHolder.getAdapterPosition();
+                        if (position == RecyclerView.NO_POSITION) return;
                         Note note = notesAdapter.getNotes().get(position);
-                        new Thread(() -> {
-                            noteDatabase.notesDao().remove(note.getId());
-                            handler.post(() -> showNotes());
-                        }).start();
-
-                        noteDatabase.notesDao().remove(note.getId());
-                        showNotes();
-                        onNoteDeleted(note);
+                        deleteNote(note);
                     }
                 });
         itemTouchHelper.attachToRecyclerView(recyclerViewNotes);
-
-
         recyclerViewNotes.setAdapter(notesAdapter);
-
-        buttonAddNote.setOnClickListener(view -> {
-            Intent intent = AddNoteActivity.newIntent(this);
-            startActivity(intent);
-        });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        showNotes();
+    private void setupDatabase() {
+        noteDatabase = NoteDatabase.getInstance(getApplication());
     }
 
-    private void initViews() {
+    private void setupEdgeToEdge() {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -89,23 +127,16 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    private void initViews() {
         buttonAddNote = findViewById(R.id.buttonAddNote);
         recyclerViewNotes = findViewById(R.id.recyclerViewNotes);
     }
 
-    private void showNotes() {
-        new Thread(() -> {
-            List<Note> notes = noteDatabase.notesDao().getNotes();
-            handler.post(() -> notesAdapter.setNotes(notes));
-        }).start();
-    }
-
-    private void onNoteDeleted(Note note) {
-        Snackbar.make(buttonAddNote, "Note deleted", Snackbar.LENGTH_LONG)
-                .setAction("Undo", v -> {
-                    noteDatabase.notesDao().add(note);
-                    showNotes();
-                })
-                .show();
+    private void showUndoSnackbar(Note note) {
+        Snackbar noteDeletedSnack = Snackbar.make(findViewById(android.R.id.content), R.string.note_deleted, Snackbar.LENGTH_LONG);
+        noteDeletedSnack.setAction(R.string.undo, v -> MainActivity.this.undoDelete(note));
+        noteDeletedSnack.show();
     }
 }
