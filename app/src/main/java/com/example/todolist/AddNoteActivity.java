@@ -3,6 +3,8 @@ package com.example.todolist;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -20,6 +22,7 @@ public class AddNoteActivity extends AppCompatActivity {
     private RadioButton radioButtonLow;
     private RadioButton radioButtonMedium;
     private Button saveButton;
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     //private final Database database = Database.getInstance();
     private NoteDatabase noteDatabase;
@@ -28,7 +31,6 @@ public class AddNoteActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initViews();
-
         noteDatabase = NoteDatabase.getInstance(getApplication());
         saveButton.setOnClickListener(view -> saveNote());
     }
@@ -54,8 +56,10 @@ public class AddNoteActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.empty_noat_toast, Toast.LENGTH_SHORT).show();
         } else {
             Note note = new Note(text, priority);
-            noteDatabase.notesDao().add(note);
-            finish();
+            new Thread(() -> {
+                noteDatabase.notesDao().add(note);
+                handler.post(this::finish);
+            }).start();
         }
     }
 

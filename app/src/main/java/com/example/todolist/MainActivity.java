@@ -2,6 +2,8 @@ package com.example.todolist;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -15,13 +17,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     private FloatingActionButton buttonAddNote;
     private RecyclerView recyclerViewNotes;
     private NotesAdapter notesAdapter;
-
     private NoteDatabase noteDatabase;
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +54,11 @@ public class MainActivity extends AppCompatActivity {
                                          int direction) {
                         int position = viewHolder.getAdapterPosition();
                         Note note = notesAdapter.getNotes().get(position);
+                        new Thread(() -> {
+                            noteDatabase.notesDao().remove(note.getId());
+                            handler.post(() -> showNotes());
+                        }).start();
+
                         noteDatabase.notesDao().remove(note.getId());
                         showNotes();
                         onNoteDeleted(note);
@@ -85,7 +94,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showNotes() {
-        notesAdapter.setNotes(noteDatabase.notesDao().getNotes());
+        new Thread(() -> {
+            List<Note> notes = noteDatabase.notesDao().getNotes();
+            handler.post(() -> notesAdapter.setNotes(notes));
+        }).start();
     }
 
     private void onNoteDeleted(Note note) {
