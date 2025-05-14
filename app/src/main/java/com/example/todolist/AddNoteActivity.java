@@ -1,20 +1,33 @@
 package com.example.todolist;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RippleDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -30,11 +43,13 @@ public class AddNoteActivity extends AppCompatActivity {
 
 
     private EditText editTextNote;
+    private TextView priorityTextView;
 
     private RadioGroup radioGroup;
     private RadioButton radioButtonLow;
     private RadioButton radioButtonMedium;
     private RadioButton radioButtonHigh;
+    private View bottomGuideline;
 
     private Button saveButton;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -45,10 +60,11 @@ public class AddNoteActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initViews();
+        animateButtons();
         setupDatabase();
         setupEdgeToEdge();
         setupOnClickListeners();
-        //checkedUncheckedRadioButton();
+        checkedUncheckedRadioButton();
     }
 
     @Override
@@ -64,12 +80,50 @@ public class AddNoteActivity extends AppCompatActivity {
     private void initViews() {
         setContentView(R.layout.activity_add_note);
         editTextNote = findViewById(R.id.editTextNote);
+        priorityTextView = findViewById(R.id.priorityTextView);
         radioGroup = findViewById(R.id.radioGroup);
         radioButtonLow = findViewById(R.id.radioButtonLow);
         radioButtonMedium = findViewById(R.id.radioButtonMedium);
         radioButtonHigh = findViewById(R.id.radioButtonHigh);
         saveButton = findViewById(R.id.saveButton);
+        bottomGuideline = findViewById(R.id.bottomGuideline);
+
+        //setting a max height to editText so the buttons stay on the screen
+        bottomGuideline.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            int maxHeight = bottomGuideline.getTop() - editTextNote.getTop();
+            editTextNote.setMaxHeight(maxHeight);
+        });
     }
+
+    private void animateButtons() {
+        editTextNote.addTextChangedListener(new TextWatcher() {
+            private int previousHeight = -1;
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Wait until next layout pass
+                editTextNote.post(() -> {
+                    int newHeight = editTextNote.getHeight();
+                    if (previousHeight != -1 && newHeight != previousHeight) {
+                        ConstraintLayout layout = findViewById(R.id.main);
+                        TransitionManager.beginDelayedTransition(layout, new AutoTransition());
+                    }
+                    previousHeight = newHeight;
+                });
+            }
+
+            // Required overrides (empty)
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {
+                editTextNote.post(() -> {
+                    // Scroll to bottom when user types more text
+                    editTextNote.setSelection(editTextNote.getText().length());
+                    //editTextNote.fullScroll(View.FOCUS_DOWN);
+                });
+            }
+        });
+    }
+
     private void setupEdgeToEdge() {
         EdgeToEdge.enable(this);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -82,6 +136,7 @@ public class AddNoteActivity extends AppCompatActivity {
     private void setupDatabase() {
         noteDatabase = NoteDatabase.getInstance(getApplication());
     }
+
     private void saveNote() {
         String text = editTextNote.getText().toString().trim();
         int priority = getPriority();
@@ -102,9 +157,10 @@ public class AddNoteActivity extends AppCompatActivity {
             });
         }
     }
+
     private int getPriority() {
         int priority;
-        if(radioButtonLow.isChecked()) priority = PRIORITY_LOW;
+        if (radioButtonLow.isChecked()) priority = PRIORITY_LOW;
         else if (radioButtonMedium.isChecked()) priority = PRIORITY_MEDIUM;
         else priority = PRIORITY_HIGH; //only radioButtonHigh left
         return priority;
@@ -114,22 +170,32 @@ public class AddNoteActivity extends AppCompatActivity {
         return new Intent(context, AddNoteActivity.class);
     }
 
-    /*private void styleRadioButton(RadioButton button, boolean isSelected, @ColorInt int color) {
+    private void styleRadioButton(RadioButton button, @ColorInt int color, float[] radii) {
+        //Background with proper corners and color
         GradientDrawable background = new GradientDrawable();
         background.setColor(color);
-        float scale = getResources().getDisplayMetrics().density;
-        background.setCornerRadius(8 * scale);
+        background.setCornerRadii(radii);
+
+        /*int rippleColor = ColorUtils.setAlphaComponent(Color.BLACK, 80);
+        ColorStateList rippleColorStateList = ColorStateList.valueOf(rippleColor);
+
+        Drawable rippleDrawable = new RippleDrawable(
+                rippleColorStateList,
+                background,
+                new GradientDrawable() {{setCornerRadii(radii);}}
+        );*/
 
         button.setBackground(background);
     }
 
     private void checkedUncheckedRadioButton() {
         RadioButton[] buttons = new RadioButton[]{radioButtonLow, radioButtonMedium, radioButtonHigh};
+        radioButtonLow.setChecked(true);
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            for (RadioButton button : buttons) {
+            for (int i = 0; i < buttons.length; i++) {
+                RadioButton button = buttons[i];
                 boolean isSelected = (button.getId() == checkedId);
-                int uncheckedColor;
-                int checkedColor;
+                int uncheckedColor, checkedColor;
 
                 if (button == radioButtonLow) {
                     uncheckedColor = ContextCompat.getColor(this, R.color.low_priority);
@@ -143,10 +209,48 @@ public class AddNoteActivity extends AppCompatActivity {
                 }
 
                 int finalColor = isSelected ? checkedColor : uncheckedColor;
-                styleRadioButton(button, isSelected, finalColor);
+
+                float radius = 8 * getResources().getDisplayMetrics().density;
+                float[] radii;
+
+                if (i == 0) radii = new float[]{radius, radius, 0, 0, 0, 0, radius, radius}; // First button (left) → round left corners
+                else if (i == buttons.length - 1) radii = new float[]{0, 0, radius, radius, radius, radius, 0, 0}; // Last button (right) → round right corners
+                else radii = new float[8]; // Middle button → no rounding
+
+                styleRadioButton(button, finalColor, radii);
+
+                if (isSelected) {
+                    applyPriorityTheme(uncheckedColor);
+                }
+
+
             }
         });
+        radioGroup.check(radioGroup.getCheckedRadioButtonId());
+        applyPriorityTheme(ContextCompat.getColor(this, R.color.low_priority));
+    }
+    private void applyPriorityTheme(@ColorInt int newColor) {
+        int currentColor = priorityTextView.getCurrentTextColor();
 
-    }*/
+        ValueAnimator colorAnimator = ValueAnimator.ofArgb(currentColor, newColor);
+        colorAnimator.setDuration(400);
+        colorAnimator.addUpdateListener(animator -> {
+            int animatedColor = (int) animator.getAnimatedValue();
 
+            // 1. Set underline color of EditText
+            Drawable background = editTextNote.getBackground().mutate();
+            if (background instanceof GradientDrawable) {
+                ((GradientDrawable) background).setColor(animatedColor);
+            } else {
+                // Fallback: use tint if not a drawable with color
+                editTextNote.setBackgroundTintList(ColorStateList.valueOf(animatedColor));
+            }
+            // 2. Set TextView text color
+            priorityTextView.setTextColor(animatedColor);
+
+            // 3. Set Save Button background tint (if you use material or drawable-based background)
+            saveButton.setBackgroundTintList(ColorStateList.valueOf(animatedColor));
+        });
+        colorAnimator.start();
+    }
 }

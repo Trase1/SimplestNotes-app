@@ -7,32 +7,73 @@
     android:layout_height="match_parent"
     tools:context=".AddNoteActivity">
 
+    <!-- Top Guideline for scrollable area -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/topGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.0" />
+
+    <!-- Bottom Guideline to limit EditText height -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/bottomGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8" />
+
+
     <EditText
         android:id="@+id/editTextNote"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:minHeight="48dp"
-        android:layout_margin="16dp"
+        android:maxHeight="0dp"
+        android:layout_margin="12dp"
+        android:padding="12dp"
         android:autofillHints=""
-        android:ems="10"
-        android:inputType="textPersonName"
+        android:inputType="textMultiLine"
         android:text=""
+        android:gravity="top"
         android:hint="@string/enter_note"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:overScrollMode="ifContentScrolls"
+        android:scrollbars="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/priorityTextView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constrainedHeight="true"
+        />
+
+    <TextView
+        android:id="@+id/priorityTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/priority"
+        android:textSize="16sp"
+        android:textColor="@color/selected_low_priority"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editTextNote"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 
     <RadioGroup
         android:id="@+id/radioGroup"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:orientation="horizontal"
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editTextNote"
-
+        app:layout_constraintTop_toBottomOf="@id/priorityTextView"
         >
 
         <RadioButton
@@ -46,6 +87,8 @@
             android:padding="8dp"
             android:text="@string/low"
             android:textSize="16sp"
+            android:textAlignment="center"
+            android:button="@null"
             />
 
         <RadioButton
@@ -57,7 +100,9 @@
             android:textColor="@color/white"
             android:padding="8dp"
             android:text="@string/medium"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textAlignment="center"
+            android:button="@null"/>
 
         <RadioButton
             android:id="@+id/radioButtonHigh"
@@ -68,7 +113,9 @@
             android:textColor="@color/white"
             android:padding="8dp"
             android:text="@string/high"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textAlignment="center"
+            android:button="@null"/>
 
     </RadioGroup>
 
@@ -80,6 +127,7 @@
         android:textAllCaps="true"
         android:text="@string/save"
         android:background="@drawable/note_background"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroup"/>
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
