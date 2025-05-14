@@ -4,10 +4,8 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.RippleDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,7 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.ScrollView;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +25,6 @@ import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.ColorUtils;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -175,16 +172,6 @@ public class AddNoteActivity extends AppCompatActivity {
         GradientDrawable background = new GradientDrawable();
         background.setColor(color);
         background.setCornerRadii(radii);
-
-        /*int rippleColor = ColorUtils.setAlphaComponent(Color.BLACK, 80);
-        ColorStateList rippleColorStateList = ColorStateList.valueOf(rippleColor);
-
-        Drawable rippleDrawable = new RippleDrawable(
-                rippleColorStateList,
-                background,
-                new GradientDrawable() {{setCornerRadii(radii);}}
-        );*/
-
         button.setBackground(background);
     }
 
