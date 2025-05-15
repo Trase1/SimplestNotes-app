@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -42,12 +43,14 @@ public class AddNoteActivity extends AppCompatActivity {
 
     private EditText editTextNote;
     private TextView priorityTextView;
+    private ConstraintLayout mainLayout;
 
     private RadioGroup radioGroup;
     private RadioButton radioButtonLow;
     private RadioButton radioButtonMedium;
     private RadioButton radioButtonHigh;
     private View bottomGuideline;
+    private int previousMaxHeight = -1;
 
     private Button saveButton;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -58,11 +61,12 @@ public class AddNoteActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initViews();
-        animateButtons();
+        setupDynamicEditTextMaxHeight(); //setting a max height to editText so the buttons and text stay on the screen
+        animateButtons(); //adding smooth transitions
         setupDatabase();
         setupEdgeToEdge();
         setupOnClickListeners();
-        checkedUncheckedRadioButton();
+        checkedUncheckedRadioButton(); //style interface according to chosen priority
     }
 
     @Override
@@ -85,11 +89,42 @@ public class AddNoteActivity extends AppCompatActivity {
         radioButtonHigh = findViewById(R.id.radioButtonHigh);
         saveButton = findViewById(R.id.saveButton);
         bottomGuideline = findViewById(R.id.bottomGuideline);
+        mainLayout = findViewById(R.id.main);
+    }
 
+    private void setupDynamicEditTextMaxHeight() {
         //setting a max height to editText so the buttons stay on the screen
-        bottomGuideline.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            int maxHeight = bottomGuideline.getTop() - editTextNote.getTop();
-            editTextNote.setMaxHeight(maxHeight);
+        mainLayout.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            Rect r = new Rect();
+            mainLayout.getWindowVisibleDisplayFrame(r);
+            int[] location = new int[2];
+            editTextNote.getLocationOnScreen(location);
+            int editTextTop = location[1];
+            int maxHeight = r.bottom - editTextTop;
+            int guidelineY = bottomGuideline.getY() > 0 ? (int) bottomGuideline.getY() : r.bottom;
+            maxHeight = Math.min(maxHeight, guidelineY - editTextTop);
+            if (editTextNote.getMaxHeight() != maxHeight) {
+                editTextNote.setMaxHeight(maxHeight);
+
+                // ...autoscroll logic as above
+                editTextNote.post(() -> {
+                    Layout layout = editTextNote.getLayout();
+                    if (layout != null) {
+                        int contentHeight = layout.getLineBottom(editTextNote.getLineCount() - 1);
+                        if (contentHeight > editTextNote.getHeight()) {
+                            int scrollDelta = layout.getLineBottom(editTextNote.getLineCount() - 1)
+                                    - editTextNote.getScrollY()
+                                    - editTextNote.getHeight();
+                            if (scrollDelta > 0) {
+                                editTextNote.scrollBy(0, scrollDelta);
+                            }
+                        }
+                    }
+                    // Always move cursor to end for writing
+                    editTextNote.setSelection(editTextNote.getText().length());
+                });
+            }
+            previousMaxHeight = maxHeight;
         });
     }
 
@@ -97,31 +132,36 @@ public class AddNoteActivity extends AppCompatActivity {
         editTextNote.addTextChangedListener(new TextWatcher() {
 
             private int previousLength = -1;
+
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 int changeAmount = Math.abs((previousLength == -1 ? 0 : previousLength) - s.length());
                 previousLength = s.length();
-                ConstraintLayout layout = findViewById(R.id.main);
                 if (changeAmount < 20) {
-                    TransitionManager.beginDelayedTransition(layout, new AutoTransition());
+                    TransitionManager.beginDelayedTransition(mainLayout, new AutoTransition());
                 } else {
-                    layout.requestLayout();
+                    mainLayout.requestLayout();
                 }
             }
 
             // Required overrides (empty)
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
-            @Override public void afterTextChanged(Editable s) {
+            @Override
+            public void afterTextChanged(Editable s) {
                 // Always keep cursor at the end and autoscroll
                 editTextNote.setSelection(editTextNote.getText().length());
-
                 editTextNote.post(() -> {
                     Layout layout = editTextNote.getLayout();
                     if (layout != null) {
-                        int scrollDelta = layout.getLineBottom(editTextNote.getLineCount() - 1) - editTextNote.getScrollY() - editTextNote.getHeight();
-                        if (scrollDelta > 0) {
-                            editTextNote.scrollBy(0, scrollDelta);
+                        int contentHeight = layout.getLineBottom(editTextNote.getLineCount() - 1);
+                        if (contentHeight > editTextNote.getHeight()) {
+                            int scrollDelta = layout.getLineBottom(editTextNote.getLineCount() - 1) - editTextNote.getScrollY() - editTextNote.getHeight();
+                            if (scrollDelta > 0) {
+                                editTextNote.scrollBy(0, scrollDelta);
+                            }
                         }
                     }
                     editTextNote.requestLayout();
@@ -132,7 +172,7 @@ public class AddNoteActivity extends AppCompatActivity {
 
     private void setupEdgeToEdge() {
         EdgeToEdge.enable(this);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(mainLayout, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -209,8 +249,10 @@ public class AddNoteActivity extends AppCompatActivity {
                 float radius = 8 * getResources().getDisplayMetrics().density;
                 float[] radii;
 
-                if (i == 0) radii = new float[]{radius, radius, 0, 0, 0, 0, radius, radius}; // First button (left) → round left corners
-                else if (i == buttons.length - 1) radii = new float[]{0, 0, radius, radius, radius, radius, 0, 0}; // Last button (right) → round right corners
+                if (i == 0)
+                    radii = new float[]{radius, radius, 0, 0, 0, 0, radius, radius}; // First button (left) → round left corners
+                else if (i == buttons.length - 1)
+                    radii = new float[]{0, 0, radius, radius, radius, radius, 0, 0}; // Last button (right) → round right corners
                 else radii = new float[8]; // Middle button → no rounding
 
                 styleRadioButton(button, finalColor, radii);
@@ -225,6 +267,7 @@ public class AddNoteActivity extends AppCompatActivity {
         radioGroup.check(radioGroup.getCheckedRadioButtonId());
         applyPriorityTheme(ContextCompat.getColor(this, R.color.low_priority));
     }
+
     private void applyPriorityTheme(@ColorInt int newColor) {
         int currentColor = priorityTextView.getCurrentTextColor();
 
