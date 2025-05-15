@@ -9,7 +9,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.Layout;
 import android.text.TextWatcher;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
@@ -50,7 +49,6 @@ public class AddNoteActivity extends AppCompatActivity {
     private RadioButton radioButtonMedium;
     private RadioButton radioButtonHigh;
     private View bottomGuideline;
-    private int previousMaxHeight = -1;
 
     private Button saveButton;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -62,7 +60,7 @@ public class AddNoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initViews();
         setupDynamicEditTextMaxHeight(); //setting a max height to editText so the buttons and text stay on the screen
-        animateButtons(); //adding smooth transitions
+        setupEditTextBehavior(); //adding smooth transitions
         setupDatabase();
         setupEdgeToEdge();
         setupOnClickListeners();
@@ -92,8 +90,10 @@ public class AddNoteActivity extends AppCompatActivity {
         mainLayout = findViewById(R.id.main);
     }
 
+
     private void setupDynamicEditTextMaxHeight() {
-        //setting a max height to editText so the buttons stay on the screen
+        // Dynamically set maxHeight based on guideline & keyboard
+
         mainLayout.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
             Rect r = new Rect();
             mainLayout.getWindowVisibleDisplayFrame(r);
@@ -103,35 +103,22 @@ public class AddNoteActivity extends AppCompatActivity {
             int maxHeight = r.bottom - editTextTop;
             int guidelineY = bottomGuideline.getY() > 0 ? (int) bottomGuideline.getY() : r.bottom;
             maxHeight = Math.min(maxHeight, guidelineY - editTextTop);
-            if (editTextNote.getMaxHeight() != maxHeight) {
-                editTextNote.setMaxHeight(maxHeight);
 
-                // ...autoscroll logic as above
-                editTextNote.post(() -> {
-                    Layout layout = editTextNote.getLayout();
-                    if (layout != null) {
-                        int contentHeight = layout.getLineBottom(editTextNote.getLineCount() - 1);
-                        if (contentHeight > editTextNote.getHeight()) {
-                            int scrollDelta = layout.getLineBottom(editTextNote.getLineCount() - 1)
-                                    - editTextNote.getScrollY()
-                                    - editTextNote.getHeight();
-                            if (scrollDelta > 0) {
-                                editTextNote.scrollBy(0, scrollDelta);
-                            }
-                        }
-                    }
-                    // Always move cursor to end for writing
-                    editTextNote.setSelection(editTextNote.getText().length());
-                });
+            // Only update if changed, to avoid unnecessary relayouts
+            if (editTextNote.getMaxHeight() != maxHeight && maxHeight > 0) {
+                editTextNote.setMaxHeight(maxHeight);
             }
-            previousMaxHeight = maxHeight;
         });
     }
 
-    private void animateButtons() {
+    private void setupEditTextBehavior() {
         editTextNote.addTextChangedListener(new TextWatcher() {
-
             private int previousLength = -1;
+
+            // Required overrides (empty)
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -144,28 +131,8 @@ public class AddNoteActivity extends AppCompatActivity {
                 }
             }
 
-            // Required overrides (empty)
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
             @Override
             public void afterTextChanged(Editable s) {
-                // Always keep cursor at the end and autoscroll
-                editTextNote.setSelection(editTextNote.getText().length());
-                editTextNote.post(() -> {
-                    Layout layout = editTextNote.getLayout();
-                    if (layout != null) {
-                        int contentHeight = layout.getLineBottom(editTextNote.getLineCount() - 1);
-                        if (contentHeight > editTextNote.getHeight()) {
-                            int scrollDelta = layout.getLineBottom(editTextNote.getLineCount() - 1) - editTextNote.getScrollY() - editTextNote.getHeight();
-                            if (scrollDelta > 0) {
-                                editTextNote.scrollBy(0, scrollDelta);
-                            }
-                        }
-                    }
-                    editTextNote.requestLayout();
-                });
             }
         });
     }
