@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.TextWatcher;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
@@ -94,28 +95,36 @@ public class AddNoteActivity extends AppCompatActivity {
 
     private void animateButtons() {
         editTextNote.addTextChangedListener(new TextWatcher() {
-            private int previousHeight = -1;
 
+            private int previousLength = -1;
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Wait until next layout pass
-                editTextNote.post(() -> {
-                    int newHeight = editTextNote.getHeight();
-                    if (previousHeight != -1 && newHeight != previousHeight) {
-                        ConstraintLayout layout = findViewById(R.id.main);
-                        TransitionManager.beginDelayedTransition(layout, new AutoTransition());
-                    }
-                    previousHeight = newHeight;
-                });
+                int changeAmount = Math.abs((previousLength == -1 ? 0 : previousLength) - s.length());
+                previousLength = s.length();
+                ConstraintLayout layout = findViewById(R.id.main);
+                if (changeAmount < 20) {
+                    TransitionManager.beginDelayedTransition(layout, new AutoTransition());
+                } else {
+                    layout.requestLayout();
+                }
             }
 
             // Required overrides (empty)
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
             @Override public void afterTextChanged(Editable s) {
+                // Always keep cursor at the end and autoscroll
+                editTextNote.setSelection(editTextNote.getText().length());
+
                 editTextNote.post(() -> {
-                    // Scroll to bottom when user types more text
-                    editTextNote.setSelection(editTextNote.getText().length());
-                    //editTextNote.fullScroll(View.FOCUS_DOWN);
+                    Layout layout = editTextNote.getLayout();
+                    if (layout != null) {
+                        int scrollDelta = layout.getLineBottom(editTextNote.getLineCount() - 1) - editTextNote.getScrollY() - editTextNote.getHeight();
+                        if (scrollDelta > 0) {
+                            editTextNote.scrollBy(0, scrollDelta);
+                        }
+                    }
+                    editTextNote.requestLayout();
                 });
             }
         });
