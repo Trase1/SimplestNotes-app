@@ -31,7 +31,7 @@
         android:minHeight="48dp"
         android:maxHeight="0dp"
         android:layout_margin="12dp"
-        android:padding="12dp"
+
         android:autofillHints=""
         android:inputType="textMultiLine"
         android:text=""
