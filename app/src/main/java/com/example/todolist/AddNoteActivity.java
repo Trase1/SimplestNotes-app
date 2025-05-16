@@ -12,7 +12,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -49,6 +51,7 @@ public class AddNoteActivity extends AppCompatActivity {
     private RadioButton radioButtonMedium;
     private RadioButton radioButtonHigh;
     private View bottomGuideline;
+    private View buttonsContainer;
 
     private Button saveButton;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -88,6 +91,7 @@ public class AddNoteActivity extends AppCompatActivity {
         saveButton = findViewById(R.id.saveButton);
         bottomGuideline = findViewById(R.id.bottomGuideline);
         mainLayout = findViewById(R.id.main);
+        buttonsContainer = findViewById(R.id.buttonsContainer);
     }
 
 
@@ -95,6 +99,8 @@ public class AddNoteActivity extends AppCompatActivity {
         // Dynamically set maxHeight based on guideline & keyboard
 
         mainLayout.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+
+            //int minAcceptableHeight = (int) (100 * getResources().getDisplayMetrics().density);
             Rect r = new Rect();
             mainLayout.getWindowVisibleDisplayFrame(r);
             int[] location = new int[2];
@@ -108,6 +114,7 @@ public class AddNoteActivity extends AppCompatActivity {
             if (editTextNote.getMaxHeight() != maxHeight && maxHeight > 0) {
                 editTextNote.setMaxHeight(maxHeight);
             }
+            Log.d("DEBUG", "maxHeight: " + maxHeight + " (editTextTop=" + editTextTop + ", r.bottom=" + r.bottom + ", guidelineY=" + guidelineY + ")");
         });
     }
 
@@ -125,7 +132,7 @@ public class AddNoteActivity extends AppCompatActivity {
                 int changeAmount = Math.abs((previousLength == -1 ? 0 : previousLength) - s.length());
                 previousLength = s.length();
                 if (changeAmount < 20) {
-                    TransitionManager.beginDelayedTransition(mainLayout, new AutoTransition());
+                    TransitionManager.beginDelayedTransition((ViewGroup) buttonsContainer, new AutoTransition());
                 } else {
                     mainLayout.requestLayout();
                 }

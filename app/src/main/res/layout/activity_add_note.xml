@@ -29,9 +29,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:minHeight="48dp"
-        android:maxHeight="0dp"
         android:layout_margin="12dp"
-
         android:autofillHints=""
         android:inputType="textMultiLine"
         android:text=""
@@ -39,12 +37,22 @@
         android:hint="@string/enter_note"
         android:overScrollMode="ifContentScrolls"
         android:scrollbars="vertical"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/priorityTextView"
+        app:layout_constraintTop_toTopOf="@id/topGuideline"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/buttonsContainer"
         app:layout_constrainedHeight="true"
         />
+
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/buttonsContainer"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    app:layout_constraintTop_toBottomOf="@id/editTextNote"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    >
 
     <TextView
         android:id="@+id/priorityTextView"
@@ -57,7 +65,7 @@
         android:textSize="16sp"
         android:textColor="@color/selected_low_priority"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editTextNote"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         />
 
@@ -129,5 +137,6 @@
         android:background="@drawable/note_background"
         app:layout_constraintTop_toBottomOf="@+id/radioGroup"
         />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
