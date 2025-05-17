@@ -140,6 +140,7 @@ public class AddNoteActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                editTextNote.requestLayout();
             }
         });
     }
