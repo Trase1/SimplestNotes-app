@@ -19,12 +19,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
@@ -114,6 +114,7 @@ public class AddNoteActivity extends AppCompatActivity {
             if (editTextNote.getMaxHeight() != maxHeight && maxHeight > 0) {
                 editTextNote.setMaxHeight(maxHeight);
             }
+            mainLayout.requestLayout();
             Log.d("DEBUG", "maxHeight: " + maxHeight + " (editTextTop=" + editTextTop + ", r.bottom=" + r.bottom + ", guidelineY=" + guidelineY + ")");
         });
     }
@@ -218,18 +219,9 @@ public class AddNoteActivity extends AppCompatActivity {
                     uncheckedColor = ContextCompat.getColor(this, R.color.high_priority);
                     checkedColor = ContextCompat.getColor(this, R.color.selected_high_priority);
                 }
-
                 int finalColor = isSelected ? checkedColor : uncheckedColor;
 
-                float radius = 8 * getResources().getDisplayMetrics().density;
-                float[] radii;
-
-                if (i == 0)
-                    radii = new float[]{radius, radius, 0, 0, 0, 0, radius, radius}; // First button (left) → round left corners
-                else if (i == buttons.length - 1)
-                    radii = new float[]{0, 0, radius, radius, radius, radius, 0, 0}; // Last button (right) → round right corners
-                else radii = new float[8]; // Middle button → no rounding
-
+                float[] radii = getRadii(i, buttons);
                 styleRadioButton(button, finalColor, radii);
 
                 if (isSelected) {
@@ -241,6 +233,19 @@ public class AddNoteActivity extends AppCompatActivity {
         });
         radioGroup.check(radioGroup.getCheckedRadioButtonId());
         applyPriorityTheme(ContextCompat.getColor(this, R.color.low_priority));
+    }
+
+    private float @NonNull [] getRadii(int i, RadioButton[] buttons) {
+        float radius = 8 * getResources().getDisplayMetrics().density;
+        float[] radii;
+
+        if (i == 0)
+            radii = new float[]{radius, radius, 0, 0, 0, 0, radius, radius}; // First button (left) → round left corners
+        else if (i == buttons.length - 1)
+            radii = new float[]{0, 0, radius, radius, radius, radius, 0, 0}; // Last button (right) → round right corners
+        else radii = new float[8]; // Middle button → no rounding
+
+        return radii;
     }
 
     private void applyPriorityTheme(@ColorInt int newColor) {
