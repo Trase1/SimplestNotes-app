@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         initViews();
         setupDatabase();
         setupRecyclerView();
-        setupOnClickListeners();
+        //setupOnClickListeners();
     }
 
     @Override
@@ -84,11 +84,18 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = AddNoteActivity.newIntent(this);
             startActivity(intent);
         });
+
+        notesAdapter.setOnNoteClickListener(note -> {
+            Intent intent = AddNoteActivity.newIntent(this);
+            intent.putExtra("note_id", note.getId());
+            intent.putExtra("note_text", note.getText());
+            intent.putExtra("note_priority", note.getPriority());
+            //startActivityForResult(intent, EDIT_NOTE_REQUEST_CODE);
+        });
     }
     private void setupRecyclerView() {
         notesAdapter = new NotesAdapter();
-        /*notesAdapter.setOnNoteClickListener(note -> {
-        });*/
+
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(
                 new ItemTouchHelper.SimpleCallback(
                         0,
@@ -112,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
         itemTouchHelper.attachToRecyclerView(recyclerViewNotes);
+        setupOnClickListeners();
         recyclerViewNotes.setAdapter(notesAdapter);
     }
 
