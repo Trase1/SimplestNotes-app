@@ -3,6 +3,7 @@ package com.example.todolist;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -23,8 +24,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
@@ -40,7 +41,11 @@ public class AddNoteActivity extends AppCompatActivity {
     public static final int PRIORITY_LOW = 0;
     public static final int PRIORITY_MEDIUM = 1;
     public static final int PRIORITY_HIGH = 2;
+    private static final String PREFS_NAME = "note_drafts";
 
+    private Note currentNote; // this should be set when editing
+
+    private String draftKey;
 
     private EditText editTextNote;
     private TextView priorityTextView;
@@ -52,6 +57,7 @@ public class AddNoteActivity extends AppCompatActivity {
     private RadioButton radioButtonHigh;
     private View bottomGuideline;
     private View buttonsContainer;
+
 
     private Button saveButton;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -66,8 +72,38 @@ public class AddNoteActivity extends AppCompatActivity {
         setupEditTextBehavior(); //adding smooth transitions
         setupDatabase();
         setupEdgeToEdge();
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Log.d("BACK", "ACTIVATED");
+                clearDraft();
+                finish();
+            }
+        });
+
+        Note note = null;
+        Intent intent = getIntent();
+        if (intent.hasExtra(getString(R.string.note_id))){
+            note = noteDatabase.notesDao().getNotes().get(intent.getIntExtra(getString(R.string.note_id), -1));
+        }
+        setupDraftKey(note);
+        restoreDraft();
+
         setupOnClickListeners();
         checkedUncheckedRadioButton(); //style interface according to chosen priority
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        String text = editTextNote.getText().toString();
+        int priority = getPriority();
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                .edit()
+                .putString(draftKey + "_text", text)
+                .putInt(draftKey + "_priority", priority)
+                .apply();
     }
 
     @Override
@@ -100,7 +136,6 @@ public class AddNoteActivity extends AppCompatActivity {
 
         mainLayout.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
 
-            //int minAcceptableHeight = (int) (100 * getResources().getDisplayMetrics().density);
             Rect r = new Rect();
             mainLayout.getWindowVisibleDisplayFrame(r);
             int[] location = new int[2];
@@ -110,12 +145,11 @@ public class AddNoteActivity extends AppCompatActivity {
             int guidelineY = bottomGuideline.getY() > 0 ? (int) bottomGuideline.getY() : r.bottom;
             maxHeight = Math.min(maxHeight, guidelineY - editTextTop);
 
-            // Only update if changed, to avoid unnecessary relayouts
+            // Only update if changed, to avoid unnecessary re-layouts
             if (editTextNote.getMaxHeight() != maxHeight && maxHeight > 0) {
                 editTextNote.setMaxHeight(maxHeight);
             }
             mainLayout.requestLayout();
-            Log.d("DEBUG", "maxHeight: " + maxHeight + " (editTextTop=" + editTextTop + ", r.bottom=" + r.bottom + ", guidelineY=" + guidelineY + ")");
         });
     }
 
@@ -171,6 +205,7 @@ public class AddNoteActivity extends AppCompatActivity {
                     noteDatabase.notesDao().add(note);
                     runOnUiThread(() -> {
                         Toast.makeText(this, R.string.note_added, Toast.LENGTH_SHORT).show();
+                        clearDraft();
                         finish();
                     });
                 } catch (Exception e) {
@@ -227,15 +262,13 @@ public class AddNoteActivity extends AppCompatActivity {
                 if (isSelected) {
                     applyPriorityTheme(uncheckedColor);
                 }
-
-
             }
         });
         radioGroup.check(radioGroup.getCheckedRadioButtonId());
         applyPriorityTheme(ContextCompat.getColor(this, R.color.low_priority));
     }
 
-    private float @NonNull [] getRadii(int i, RadioButton[] buttons) {
+    private float[] getRadii(int i, RadioButton[] buttons) {
         float radius = 8 * getResources().getDisplayMetrics().density;
         float[] radii;
 
@@ -271,5 +304,38 @@ public class AddNoteActivity extends AppCompatActivity {
             saveButton.setBackgroundTintList(ColorStateList.valueOf(animatedColor));
         });
         colorAnimator.start();
+    }
+
+    private void setupDraftKey(Note note) {
+        if (note != null && note.getId() != 0) {
+            draftKey = "draft_note_" + note.getId(); //editing
+        } else {
+            draftKey = "draft_new_note"; //adding
+        }
+    }
+
+    private void restoreDraft() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String draft = prefs.getString(draftKey + "_text", null);
+        int draftPriority = prefs.getInt(draftKey + "_priority", -1);
+
+        if (draft != null && !draft.isEmpty()) {
+            editTextNote.setText(draft);
+            editTextNote.setSelection(draft.length());
+        }
+
+        if (draftPriority != -1) {
+            if (draftPriority == PRIORITY_LOW) radioButtonLow.setChecked(true);
+            else if (draftPriority == PRIORITY_MEDIUM) radioButtonMedium.setChecked(true);
+            else if (draftPriority == PRIORITY_HIGH) radioButtonHigh.setChecked(true);
+        }
+    }
+
+    private void clearDraft() {
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                .edit()
+                .remove(draftKey + "_text")
+                .remove(draftKey + "_priority")
+                .apply();
     }
 }

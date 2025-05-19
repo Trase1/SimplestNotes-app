@@ -12,7 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TodoList"
         android:hardwareAccelerated="true"
-        tools:targetApi="31">
+        android:enableOnBackInvokedCallback="true"
+        tools:targetApi="33">
         <activity
             android:name=".AddNoteActivity"
             android:exported="false" />
