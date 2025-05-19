@@ -13,7 +13,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -72,26 +71,32 @@ public class AddNoteActivity extends AppCompatActivity {
         setupEditTextBehavior(); //adding smooth transitions
         setupDatabase();
         setupEdgeToEdge();
+        setupOnClickListeners();
+        checkedUncheckedRadioButton(); //style interface according to chosen priority
+        onBack();
+        onRestore();
+    }
 
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                Log.d("BACK", "ACTIVATED");
-                clearDraft();
-                finish();
-            }
-        });
-
+    private void onRestore() {
         Note note = null;
         Intent intent = getIntent();
-        if (intent.hasExtra(getString(R.string.note_id))){
-            note = noteDatabase.notesDao().getNotes().get(intent.getIntExtra(getString(R.string.note_id), -1));
+        if (intent.hasExtra("note_id")){
+            note = noteDatabase.notesDao().getNotes().get(intent.getIntExtra("note_id", -1));
         }
         setupDraftKey(note);
         restoreDraft();
+    }
 
-        setupOnClickListeners();
-        checkedUncheckedRadioButton(); //style interface according to chosen priority
+    private void onBack() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                clearDraft();
+                editTextNote.setText("");
+                setPriorityUI(PRIORITY_LOW);
+                finish();
+            }
+        });
     }
 
     @Override
@@ -99,6 +104,7 @@ public class AddNoteActivity extends AppCompatActivity {
         super.onPause();
         String text = editTextNote.getText().toString();
         int priority = getPriority();
+
         getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                 .edit()
                 .putString(draftKey + "_text", text)
@@ -206,6 +212,8 @@ public class AddNoteActivity extends AppCompatActivity {
                     runOnUiThread(() -> {
                         Toast.makeText(this, R.string.note_added, Toast.LENGTH_SHORT).show();
                         clearDraft();
+                        editTextNote.setText("");
+                        setPriorityUI(PRIORITY_LOW);
                         finish();
                     });
                 } catch (Exception e) {
@@ -236,36 +244,40 @@ public class AddNoteActivity extends AppCompatActivity {
     }
 
     private void checkedUncheckedRadioButton() {
-        RadioButton[] buttons = new RadioButton[]{radioButtonLow, radioButtonMedium, radioButtonHigh};
-        radioButtonLow.setChecked(true);
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            for (int i = 0; i < buttons.length; i++) {
-                RadioButton button = buttons[i];
-                boolean isSelected = (button.getId() == checkedId);
-                int uncheckedColor, checkedColor;
-
-                if (button == radioButtonLow) {
-                    uncheckedColor = ContextCompat.getColor(this, R.color.low_priority);
-                    checkedColor = ContextCompat.getColor(this, R.color.selected_low_priority);
-                } else if (button == radioButtonMedium) {
-                    uncheckedColor = ContextCompat.getColor(this, R.color.medium_priority);
-                    checkedColor = ContextCompat.getColor(this, R.color.selected_medium_priority);
-                } else {
-                    uncheckedColor = ContextCompat.getColor(this, R.color.high_priority);
-                    checkedColor = ContextCompat.getColor(this, R.color.selected_high_priority);
-                }
-                int finalColor = isSelected ? checkedColor : uncheckedColor;
-
-                float[] radii = getRadii(i, buttons);
-                styleRadioButton(button, finalColor, radii);
-
-                if (isSelected) {
-                    applyPriorityTheme(uncheckedColor);
-                }
-            }
+            int priority = PRIORITY_LOW;
+            if (radioButtonMedium.getId() == checkedId) priority = PRIORITY_MEDIUM;
+            else if (radioButtonHigh.getId() == checkedId) priority = PRIORITY_HIGH;
+            setPriorityUI(priority);
         });
-        radioGroup.check(radioGroup.getCheckedRadioButtonId());
-        applyPriorityTheme(ContextCompat.getColor(this, R.color.low_priority));
+    }
+
+    private void setPriorityUI(int priority) {
+        // 1. Set radio
+        if (priority == PRIORITY_LOW) radioButtonLow.setChecked(true);
+        else if (priority == PRIORITY_MEDIUM) radioButtonMedium.setChecked(true);
+        else if (priority == PRIORITY_HIGH) radioButtonHigh.setChecked(true);
+
+        // 2. Set colors for all radios and apply main theme
+        int[] checkedColors = {
+                ContextCompat.getColor(this, R.color.selected_low_priority),
+                ContextCompat.getColor(this, R.color.selected_medium_priority),
+                ContextCompat.getColor(this, R.color.selected_high_priority)
+        };
+        int[] uncheckedColors = {
+                ContextCompat.getColor(this, R.color.low_priority),
+                ContextCompat.getColor(this, R.color.medium_priority),
+                ContextCompat.getColor(this, R.color.high_priority)
+        };
+        RadioButton[] radios = {radioButtonLow, radioButtonMedium, radioButtonHigh};
+
+        for (int i = 0; i < radios.length; i++) {
+            float[] radii = getRadii(i, radios);
+            int color = (i == priority) ? checkedColors[i] : uncheckedColors[i];
+            styleRadioButton(radios[i], color, radii);
+        }
+
+        applyPriorityTheme(uncheckedColors[priority]);
     }
 
     private float[] getRadii(int i, RadioButton[] buttons) {
@@ -324,11 +336,8 @@ public class AddNoteActivity extends AppCompatActivity {
             editTextNote.setSelection(draft.length());
         }
 
-        if (draftPriority != -1) {
-            if (draftPriority == PRIORITY_LOW) radioButtonLow.setChecked(true);
-            else if (draftPriority == PRIORITY_MEDIUM) radioButtonMedium.setChecked(true);
-            else if (draftPriority == PRIORITY_HIGH) radioButtonHigh.setChecked(true);
-        }
+        int priorityToSet = (draftPriority != -1) ? draftPriority : PRIORITY_LOW;
+        setPriorityUI(priorityToSet);
     }
 
     private void clearDraft() {
