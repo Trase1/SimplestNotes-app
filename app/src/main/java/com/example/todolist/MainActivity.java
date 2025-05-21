@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -26,7 +28,12 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerViewNotes;
     private NotesAdapter notesAdapter;
     private NoteDatabase noteDatabase;
+
+    public static final String EXTRA_NOTE_ID = "note_id";
+    public static final String EXTRA_NOTE_TEXT = "note_text";
+    public static final String EXTRA_NOTE_PRIORITY = "note_priority";
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private ActivityResultLauncher<Intent> editNoteLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +42,28 @@ public class MainActivity extends AppCompatActivity {
         initViews();
         setupDatabase();
         setupRecyclerView();
-        //setupOnClickListeners();
+    }
+
+    private void onEdit() {
+        editNoteLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        Intent data = result.getData();
+                        int id = data.getIntExtra(EXTRA_NOTE_ID, -1);
+                        String text = data.getStringExtra(EXTRA_NOTE_TEXT);
+                        int priority = data.getIntExtra(EXTRA_NOTE_PRIORITY, 1);
+                        if (id != -1) {
+                            Note updatedNote = new Note(id, text, priority);
+                            executor.execute(() -> {
+                                noteDatabase.notesDao().add(updatedNote);
+                                showNotes();
+                            });
+
+                        }
+                    }
+                }
+        );
     }
 
     @Override
@@ -64,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
     private void deleteNote(Note note) {
         executor.execute(() -> {
             try {
-                noteDatabase.notesDao().remove(note/*.getId()*/);
+                noteDatabase.notesDao().remove(note);
                 runOnUiThread(() -> showUndoSnackbar(note));
                 showNotes();
             } catch (Exception e) {
@@ -85,13 +113,14 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        notesAdapter.setOnNoteClickListener(note -> {
-            Intent intent = AddNoteActivity.newIntent(this);
-            intent.putExtra("note_id", note.getId());
-            intent.putExtra("note_text", note.getText());
-            intent.putExtra("note_priority", note.getPriority());
-            //startActivityForResult(intent, EDIT_NOTE_REQUEST_CODE);
-        });
+        NotesAdapter.OnNoteClickListener noteClickListener  = note -> {
+            Intent intent = new Intent(MainActivity.this, AddNoteActivity.class);
+            intent.putExtra(EXTRA_NOTE_ID, note.getId());
+            intent.putExtra(EXTRA_NOTE_TEXT, note.getText());
+            intent.putExtra(EXTRA_NOTE_PRIORITY, note.getPriority());
+            editNoteLauncher.launch(intent);
+        };
+        notesAdapter.setOnNoteClickListener(noteClickListener);
     }
     private void setupRecyclerView() {
         notesAdapter = new NotesAdapter();

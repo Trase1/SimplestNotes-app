@@ -25,12 +25,15 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import org.jetbrains.annotations.Contract;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,6 +46,7 @@ public class AddNoteActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "note_drafts";
 
     private Note currentNote; // this should be set when editing
+    private int editingNoteId = -1;
 
     private String draftKey;
 
@@ -73,18 +77,41 @@ public class AddNoteActivity extends AppCompatActivity {
         setupEdgeToEdge();
         setupOnClickListeners();
         checkedUncheckedRadioButton(); //style interface according to chosen priority
+        onEdit();
         onBack();
         onRestore();
     }
 
     private void onRestore() {
-        Note note = null;
         Intent intent = getIntent();
-        if (intent.hasExtra("note_id")){
-            note = noteDatabase.notesDao().getNotes().get(intent.getIntExtra("note_id", -1));
+        if (intent.hasExtra("note_id")) {
+            executor.execute(() -> {
+                Note note = noteDatabase.notesDao().getNotes().get(intent.getIntExtra("note_id", -1));
+                setupDraftKey(note);
+            });
         }
-        setupDraftKey(note);
         restoreDraft();
+    }
+
+    private void onEdit() {
+        Intent intent = getIntent();
+        if (intent.hasExtra(MainActivity.EXTRA_NOTE_ID)) {
+            // Edit mode
+            editingNoteId = intent.getIntExtra(MainActivity.EXTRA_NOTE_ID, -1);
+            String text = intent.getStringExtra(MainActivity.EXTRA_NOTE_TEXT);
+            int priority = intent.getIntExtra(MainActivity.EXTRA_NOTE_PRIORITY, 1);
+
+            editTextNote.setText(text);
+
+            // Set correct radio button for priority
+            if (priority == 1) {
+                radioGroup.check(R.id.radioButtonLow);
+            } else if (priority == 2) {
+                radioGroup.check(R.id.radioButtonMedium);
+            } else if (priority == 3) {
+                radioGroup.check(R.id.radioButtonHigh);
+            }
+        }
     }
 
     private void onBack() {
@@ -202,7 +229,18 @@ public class AddNoteActivity extends AppCompatActivity {
     private void saveNote() {
         String text = editTextNote.getText().toString().trim();
         int priority = getPriority();
-        if (text.isEmpty()) {
+        //edit note
+        if (editingNoteId != -1) {
+            Intent data = new Intent();
+            data.putExtra(MainActivity.EXTRA_NOTE_TEXT, text);
+            data.putExtra(MainActivity.EXTRA_NOTE_PRIORITY, priority);
+            data.putExtra(MainActivity.EXTRA_NOTE_ID, editingNoteId);
+            setResult(RESULT_OK, data);
+            finish();
+
+        }
+        //new note
+        else if (text.isEmpty()) {
             Toast.makeText(this, R.string.empty_note_toast, Toast.LENGTH_SHORT).show();
         } else {
             Note note = new Note(text, priority);
@@ -231,11 +269,13 @@ public class AddNoteActivity extends AppCompatActivity {
         return priority;
     }
 
+    @NonNull
+    @Contract("_ -> new")
     public static Intent newIntent(Context context) {
         return new Intent(context, AddNoteActivity.class);
     }
 
-    private void styleRadioButton(RadioButton button, @ColorInt int color, float[] radii) {
+    private void styleRadioButton(@NonNull RadioButton button, @ColorInt int color, float[] radii) {
         //Background with proper corners and color
         GradientDrawable background = new GradientDrawable();
         background.setColor(color);
@@ -280,6 +320,7 @@ public class AddNoteActivity extends AppCompatActivity {
         applyPriorityTheme(uncheckedColors[priority]);
     }
 
+    @NonNull
     private float[] getRadii(int i, RadioButton[] buttons) {
         float radius = 8 * getResources().getDisplayMetrics().density;
         float[] radii;

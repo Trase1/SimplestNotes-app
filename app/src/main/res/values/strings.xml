@@ -16,6 +16,6 @@
     <string name="draft_new_note" translatable="false">draft_new_note</string>
     <string name="draft_note" translatable="false">draft_note_</string>
     <string name="note_id" translatable="false">note_id</string>
-    <string name="text">_text</string>
-    <string name="priority_draft">_priority</string>
+    <string name="text" translatable="false">_text</string>
+    <string name="priority_draft" translatable="false">_priority</string>
 </resources>
