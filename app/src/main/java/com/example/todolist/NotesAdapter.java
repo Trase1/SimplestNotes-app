@@ -46,8 +46,6 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
             ((GradientDrawable) drawable).setColor(color);
             notesViewHolder.textViewNote.setBackground(drawable);
         }
-        /*
-        notesViewHolder.textViewNote.setBackgroundColor(color);*/
 
         notesViewHolder.itemView.setOnClickListener(view -> {
             if (onNoteClickListener != null) {
