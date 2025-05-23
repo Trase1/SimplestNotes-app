@@ -84,11 +84,13 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
     public static class NotesViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView textViewNote;
+
         public NotesViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewNote = itemView.findViewById(R.id.textViewNote);
         }
     }
+
     @FunctionalInterface
     public interface OnNoteClickListener {
         void onNoteClick(Note note);
