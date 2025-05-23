@@ -44,10 +44,7 @@ public class AddNoteActivity extends AppCompatActivity {
     public static final int PRIORITY_MEDIUM = 1;
     public static final int PRIORITY_HIGH = 2;
     private static final String PREFS_NAME = "note_drafts";
-
-    private Note currentNote; // this should be set when editing
     private int editingNoteId = -1;
-
     private String draftKey;
 
     private EditText editTextNote;

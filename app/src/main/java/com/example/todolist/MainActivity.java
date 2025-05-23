@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         executor.shutdown();
     }
+
     private void showNotes() {
         executor.execute(() -> {
             try {
@@ -109,13 +110,14 @@ public class MainActivity extends AppCompatActivity {
             showNotes();
         });
     }
+
     private void setupOnClickListeners() {
         buttonAddNote.setOnClickListener(view -> {
             Intent intent = AddNoteActivity.newIntent(this);
             startActivity(intent);
         });
 
-        NotesAdapter.OnNoteClickListener noteClickListener  = note -> {
+        NotesAdapter.OnNoteClickListener noteClickListener = note -> {
             Intent intent = new Intent(MainActivity.this, AddNoteActivity.class);
             intent.putExtra(EXTRA_NOTE_ID, note.getId());
             intent.putExtra(EXTRA_NOTE_TEXT, note.getText());
@@ -124,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         };
         notesAdapter.setOnNoteClickListener(noteClickListener);
     }
+
     private void setupRecyclerView() {
         notesAdapter = new NotesAdapter();
 
@@ -145,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                                          int direction) {
                         int position = viewHolder.getAdapterPosition();
                         if (position == RecyclerView.NO_POSITION) return;
-                        Note note = null;
+                        Note note;
                         if (position >= 0 && position < notesAdapter.getNotes().size()) {
                             note = notesAdapter.getNotes().get(position);
                             deleteNote(note);

@@ -15,7 +15,6 @@ public class Note {
     private final int priority;
 
 
-
     public Note(int id, String text, int priority) {
         this.id = id;
         this.text = text;
@@ -42,9 +41,12 @@ public class Note {
 
     public int getColorResId() {
         switch (priority) {
-            case 0: return R.color.low_priority;
-            case 1: return R.color.medium_priority;
-            default: return R.color.high_priority;
+            case 0:
+                return R.color.low_priority;
+            case 1:
+                return R.color.medium_priority;
+            default:
+                return R.color.high_priority;
         }
     }
 
