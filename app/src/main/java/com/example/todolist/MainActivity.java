@@ -41,7 +41,9 @@ public class MainActivity extends AppCompatActivity {
         setupEdgeToEdge();
         initViews();
         setupDatabase();
+        onEdit();
         setupRecyclerView();
+
     }
 
     private void onEdit() {
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                         if (id != -1) {
                             Note updatedNote = new Note(id, text, priority);
                             executor.execute(() -> {
-                                noteDatabase.notesDao().add(updatedNote);
+                                noteDatabase.notesDao().update(updatedNote);
                                 showNotes();
                             });
 
@@ -143,8 +145,11 @@ public class MainActivity extends AppCompatActivity {
                                          int direction) {
                         int position = viewHolder.getAdapterPosition();
                         if (position == RecyclerView.NO_POSITION) return;
-                        Note note = notesAdapter.getNotes().get(position);
-                        deleteNote(note);
+                        Note note = null;
+                        if (position >= 0 && position < notesAdapter.getNotes().size()) {
+                            note = notesAdapter.getNotes().get(position);
+                            deleteNote(note);
+                        }
                     }
                 });
         itemTouchHelper.attachToRecyclerView(recyclerViewNotes);

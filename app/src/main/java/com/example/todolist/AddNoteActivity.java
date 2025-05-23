@@ -77,16 +77,17 @@ public class AddNoteActivity extends AppCompatActivity {
         setupEdgeToEdge();
         setupOnClickListeners();
         checkedUncheckedRadioButton(); //style interface according to chosen priority
-        onEdit();
         onBack();
         onRestore();
+        onEdit();
     }
 
     private void onRestore() {
         Intent intent = getIntent();
-        if (intent.hasExtra("note_id")) {
+        if (intent.hasExtra(MainActivity.EXTRA_NOTE_ID)) {
+            int noteId = intent.getIntExtra(MainActivity.EXTRA_NOTE_ID, -1);
             executor.execute(() -> {
-                Note note = noteDatabase.notesDao().getNotes().get(intent.getIntExtra("note_id", -1));
+                Note note = noteDatabase.notesDao().getNoteById(noteId);
                 setupDraftKey(note);
             });
         }
@@ -104,11 +105,11 @@ public class AddNoteActivity extends AppCompatActivity {
             editTextNote.setText(text);
 
             // Set correct radio button for priority
-            if (priority == 1) {
+            if (priority == 0) {
                 radioGroup.check(R.id.radioButtonLow);
-            } else if (priority == 2) {
+            } else if (priority == 1) {
                 radioGroup.check(R.id.radioButtonMedium);
-            } else if (priority == 3) {
+            } else if (priority == 2) {
                 radioGroup.check(R.id.radioButtonHigh);
             }
         }
