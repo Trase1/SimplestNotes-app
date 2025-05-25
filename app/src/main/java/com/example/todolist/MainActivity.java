@@ -1,7 +1,11 @@
 package com.example.todolist;
 
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -9,6 +13,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -182,6 +187,28 @@ public class MainActivity extends AppCompatActivity {
     private void showUndoSnackbar(Note note) {
         Snackbar noteDeletedSnack = Snackbar.make(findViewById(android.R.id.content), R.string.note_deleted, Snackbar.LENGTH_LONG);
         noteDeletedSnack.setAction(R.string.undo, v -> MainActivity.this.undoDelete(note));
+        View snackbarView = noteDeletedSnack.getView();
+        if (snackbarView instanceof FrameLayout) {
+            FrameLayout frameLayout = (FrameLayout) snackbarView;
+
+            // Create background with rounded corners
+            GradientDrawable shape = new GradientDrawable();
+            shape.setShape(GradientDrawable.RECTANGLE);
+            shape.setCornerRadius(dpToPx(8)); // 8dp radius
+            shape.setColor(ContextCompat.getColor(this, R.color.white));
+
+            // Set background
+            frameLayout.setBackground(shape);
+
+        }
         noteDeletedSnack.show();
+    }
+
+    private float dpToPx(int dp) {
+        return TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dp,
+                getResources().getDisplayMetrics()
+        );
     }
 }

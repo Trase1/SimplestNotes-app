@@ -18,4 +18,6 @@
     <string name="note_id" translatable="false">note_id</string>
     <string name="text" translatable="false">_text</string>
     <string name="priority_draft" translatable="false">_priority</string>
+    <string name="donate_qr_code">Support development 😊</string>
+    <string name="support_the_app">Support development 😊 Scan to donate.</string>
 </resources>
