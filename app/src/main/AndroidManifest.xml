@@ -16,7 +16,9 @@
         tools:targetApi="33">
         <activity
             android:name=".AddNoteActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustResize|stateHidden"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

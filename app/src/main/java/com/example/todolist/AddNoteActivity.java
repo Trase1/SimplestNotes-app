@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -15,6 +16,8 @@ import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -22,15 +25,16 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import org.jetbrains.annotations.Contract;
@@ -66,6 +70,7 @@ public class AddNoteActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         initViews();
         setupDynamicEditTextMaxHeight(); //setting a max height to editText so the buttons and text stay on the screen
@@ -159,8 +164,12 @@ public class AddNoteActivity extends AppCompatActivity {
         bottomGuideline = findViewById(R.id.bottomGuideline);
         mainLayout = findViewById(R.id.main);
         buttonsContainer = findViewById(R.id.buttonsContainer);
-    }
 
+        editTextNote.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+    }
 
     private void setupDynamicEditTextMaxHeight() {
         // Dynamically set maxHeight based on guideline & keyboard
@@ -212,12 +221,20 @@ public class AddNoteActivity extends AppCompatActivity {
     }
 
     private void setupEdgeToEdge() {
-        EdgeToEdge.enable(this);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         ViewCompat.setOnApplyWindowInsetsListener(mainLayout, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+
             return insets;
         });
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Reset insets when orientation changes
+        ViewCompat.requestApplyInsets(mainLayout);
     }
 
     private void setupDatabase() {
@@ -315,21 +332,8 @@ public class AddNoteActivity extends AppCompatActivity {
             styleRadioButton(radios[i], color, radii);
         }
 
+
         applyPriorityTheme(uncheckedColors[priority]);
-    }
-
-    @NonNull
-    private float[] getRadii(int i, RadioButton[] buttons) {
-        float radius = 8 * getResources().getDisplayMetrics().density;
-        float[] radii;
-
-        if (i == 0)
-            radii = new float[]{radius, radius, 0, 0, 0, 0, radius, radius}; // First button (left) → round left corners
-        else if (i == buttons.length - 1)
-            radii = new float[]{0, 0, radius, radius, radius, radius, 0, 0}; // Last button (right) → round right corners
-        else radii = new float[8]; // Middle button → no rounding
-
-        return radii;
     }
 
     private void applyPriorityTheme(@ColorInt int newColor) {
@@ -353,8 +357,42 @@ public class AddNoteActivity extends AppCompatActivity {
 
             // 3. Set Save Button background tint (if you use material or drawable-based background)
             saveButton.setBackgroundTintList(ColorStateList.valueOf(animatedColor));
+
+            // New: Update status bar color
+            getWindow().setStatusBarColor(animatedColor);
+
+            // Adjust status bar icons for better visibility
+            setStatusBarIconColor(animatedColor);
         });
         colorAnimator.start();
+    }
+
+    private void setStatusBarIconColor(@ColorInt int backgroundColor) {
+        // Calculate appropriate icon color (light/dark)
+        boolean isDark = ColorUtils.calculateLuminance(backgroundColor) < 0.5;
+
+        View decorView = getWindow().getDecorView();
+        int flags = decorView.getSystemUiVisibility();
+        if (isDark) {
+            flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        } else {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        }
+        decorView.setSystemUiVisibility(flags);
+    }
+
+    @NonNull
+    private float[] getRadii(int i, RadioButton[] buttons) {
+        float radius = 8 * getResources().getDisplayMetrics().density;
+        float[] radii;
+
+        if (i == 0)
+            radii = new float[]{radius, radius, 0, 0, 0, 0, radius, radius}; // First button (left) → round left corners
+        else if (i == buttons.length - 1)
+            radii = new float[]{0, 0, radius, radius, radius, radius, 0, 0}; // Last button (right) → round right corners
+        else radii = new float[8]; // Middle button → no rounding
+
+        return radii;
     }
 
     private void setupDraftKey(Note note) {
