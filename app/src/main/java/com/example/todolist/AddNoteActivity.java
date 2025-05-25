@@ -360,6 +360,7 @@ public class AddNoteActivity extends AppCompatActivity {
 
             // New: Update status bar color
             getWindow().setStatusBarColor(animatedColor);
+            getWindow().setNavigationBarColor(animatedColor);
 
             // Adjust status bar icons for better visibility
             setStatusBarIconColor(animatedColor);
