@@ -6,7 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:orientation="vertical"
+    android:orientation="horizontal"
+    android:fitsSystemWindows="true"
+    android:imeOptions="flagNoExtractUi"
     tools:context=".AddNoteActivity">
 
     <!-- Top Guideline for scrollable area -->
@@ -23,29 +25,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.8" />
+        app:layout_constraintGuide_percent="0.5" />
 
 
     <EditText
         android:id="@+id/editTextNote"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="48dp"
         android:layout_margin="12dp"
         android:autofillHints=""
-        android:inputType="textMultiLine"
-        android:text=""
         android:gravity="top"
         android:hint="@string/enter_note"
+        android:inputType="textMultiLine"
+        android:minHeight="48dp"
         android:overScrollMode="ifContentScrolls"
-        android:scrollbars="vertical"
         android:saveEnabled="false"
-        app:layout_constraintTop_toTopOf="@id/topGuideline"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/buttonsContainer"
+        android:scrollbars="vertical"
+        android:text=""
         app:layout_constrainedHeight="true"
-        />
+        app:layout_constraintBottom_toTopOf="@id/buttonsContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/topGuideline" />
 
 
 <androidx.constraintlayout.widget.ConstraintLayout
