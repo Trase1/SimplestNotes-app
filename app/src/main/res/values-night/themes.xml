@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.TodoList" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <item name="colorSecondary">@color/low_priority</item>
+        <!--<item name="colorSecondary">@color/low_priority</item>-->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus">false</item>

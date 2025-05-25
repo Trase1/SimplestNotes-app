@@ -42,6 +42,7 @@ import org.jetbrains.annotations.Contract;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
 public class AddNoteActivity extends AppCompatActivity {
 
     public static final int PRIORITY_LOW = 0;
