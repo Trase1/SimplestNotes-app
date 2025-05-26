@@ -10,6 +10,7 @@ constraintlayout = "2.2.1"
 room_version = "2.7.1"
 rxandroid_version="3.0.2"
 rxjava_version= "3.1.10"
+core = "1.16.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -25,6 +26,7 @@ room-rxjava3 = {group = "androidx.room", name = "room-rxjava3", version.ref ="ro
 
 rxandroid = {group = "io.reactivex.rxjava3", name = "rxandroid", version.ref ="rxandroid_version"}
 rxjava = {group = "io.reactivex.rxjava3", name = "rxjava", version.ref ="rxjava_version"}
+core = { group = "androidx.core", name = "core", version.ref = "core" }
 
 
 [plugins]

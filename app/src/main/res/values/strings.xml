@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">TodoList</string>
+    <string name="app_name" translatable="false">Simplest Notes</string>
     <string name="enter_note">Write your note here…</string>
     <string name="low">Low</string>
     <string name="medium">Medium</string>
@@ -19,5 +19,5 @@
     <string name="text" translatable="false">_text</string>
     <string name="priority_draft" translatable="false">_priority</string>
     <string name="donate_qr_code">Support development 😊</string>
-    <string name="support_the_app">Support development 😊 Scan to donate.</string>
+    <string name="support_the_app">Support development 😊 Scan or tap to donate.</string>
 </resources>

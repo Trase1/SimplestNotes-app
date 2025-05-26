@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -7,7 +8,8 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:orientation="vertical"
-    tools:context=".AddNoteActivity">
+    tools:context=".AddNoteActivity"
+    android:fillViewport="true">
 
     <!-- Top Guideline for scrollable area -->
     <androidx.constraintlayout.widget.Guideline
@@ -141,31 +143,38 @@
         app:layout_constraintTop_toBottomOf="@+id/radioGroup"
         />
 
-    <ImageView
-        android:id="@+id/qrDonation"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginBottom="8dp"
-        android:src="@drawable/qr_donate"
-        app:layout_constraintTop_toBottomOf="@id/saveButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:contentDescription="@string/donate_qr_code" />
-
-    <TextView
-        android:id="@+id/donateText"
+    <LinearLayout
+        android:id="@+id/qrDonationContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/support_the_app"
-        android:textSize="14sp"
-        android:textColor="@android:color/darker_gray"
-        app:layout_constraintTop_toBottomOf="@id/qrDonation"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:layout_marginTop="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/saveButton">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageView
+            android:id="@+id/qrDonation"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:contentDescription="@string/donate_qr_code"
+            android:src="@drawable/qr_donate"
+            android:background="@drawable/qr_background"/>
+
+        <TextView
+            android:id="@+id/donateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/support_the_app"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

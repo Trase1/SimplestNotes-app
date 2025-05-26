@@ -1,4 +1,4 @@
-package com.example.todolist;
+package com.example.SimplestNotes;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,6 +21,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -62,6 +64,8 @@ public class AddNoteActivity extends AppCompatActivity {
     private RadioButton radioButtonHigh;
     private View bottomGuideline;
     private View buttonsContainer;
+    private ImageView qrImage;
+    private Drawable qrBackground;
 
 
     private Button saveButton;
@@ -151,6 +155,12 @@ public class AddNoteActivity extends AppCompatActivity {
 
     private void setupOnClickListeners() {
         saveButton.setOnClickListener(view -> saveNote());
+        qrImage.setOnClickListener(v -> {
+            String url = "https://boosty.to/trase1/donate"; // Use your real link!
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+        });
     }
 
     private void initViews() {
@@ -165,6 +175,8 @@ public class AddNoteActivity extends AppCompatActivity {
         bottomGuideline = findViewById(R.id.bottomGuideline);
         mainLayout = findViewById(R.id.main);
         buttonsContainer = findViewById(R.id.buttonsContainer);
+        qrImage = findViewById(R.id.qrDonation);
+        qrBackground = getDrawable(R.drawable.qr_background);
 
         editTextNote.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -365,6 +377,12 @@ public class AddNoteActivity extends AppCompatActivity {
 
             // Adjust status bar icons for better visibility
             setStatusBarIconColor(animatedColor);
+
+            Drawable qrBack = qrImage.getBackground();
+            if (qrBack instanceof GradientDrawable) {
+                ((GradientDrawable) qrBack).setColor(animatedColor);
+            }
+
         });
         colorAnimator.start();
     }
