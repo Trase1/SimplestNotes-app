@@ -1,4 +1,4 @@
-package com.example.todolist;
+package com.example.SimplestNotes;
 
 import androidx.room.Dao;
 import androidx.room.Delete;

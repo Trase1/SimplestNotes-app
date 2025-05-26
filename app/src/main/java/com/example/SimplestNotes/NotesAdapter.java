@@ -1,4 +1,4 @@
-package com.example.todolist;
+package com.example.SimplestNotes;
 
 import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;

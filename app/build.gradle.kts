@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.todolist"
+    namespace = "com.example.SimplestNotes"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.todolist"
+        applicationId = "com.example.SimplestNotes"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.room)
+    implementation(libs.core)
     annotationProcessor(libs.room.annotation.processor)
     implementation(libs.room.rxjava3)
     implementation(libs.rxandroid)

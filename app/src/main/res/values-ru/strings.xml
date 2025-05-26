@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">TodoList</string>
     <string name="enter_note">Введите заметку:</string>
     <string name="low">Низкая</string>
     <string name="medium">Средняя</string>
@@ -14,4 +13,6 @@
     <string name="note_added">Заметка добавлена</string>
     <string name="add_new_note_button_label">Добавить новую заметку\n</string>
     <string name="priority">Важность:</string>
+    <string name="donate_qr_code">Поддержите разработку 😊</string>
+    <string name="support_the_app">Поддержите разработку 😊 Отсканируйте или нажмите , чтобы задонатить.</string>
 </resources>
