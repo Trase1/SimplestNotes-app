@@ -31,6 +31,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
@@ -176,7 +177,7 @@ public class AddNoteActivity extends AppCompatActivity {
         mainLayout = findViewById(R.id.main);
         buttonsContainer = findViewById(R.id.buttonsContainer);
         qrImage = findViewById(R.id.qrDonation);
-        qrBackground = getDrawable(R.drawable.qr_background);
+        qrBackground = AppCompatResources.getDrawable(this, R.drawable.qr_background);
 
         editTextNote.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
