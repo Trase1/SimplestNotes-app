@@ -139,11 +139,7 @@ public class AddNoteActivity extends AppCompatActivity {
         String text = editTextNote.getText().toString();
         int priority = getPriority();
 
-        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-                .edit()
-                .putString(draftKey + "_text", text)
-                .putInt(draftKey + "_priority", priority)
-                .apply();
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().putString(draftKey + "_text", text).putInt(draftKey + "_priority", priority).apply();
     }
 
     @Override
@@ -343,7 +339,6 @@ public class AddNoteActivity extends AppCompatActivity {
             styleRadioButton(radios[i], color, radii);
         }
 
-
         applyPriorityTheme(uncheckedColors[priority]);
     }
 
@@ -355,7 +350,7 @@ public class AddNoteActivity extends AppCompatActivity {
         colorAnimator.addUpdateListener(animator -> {
             int animatedColor = (int) animator.getAnimatedValue();
 
-            // 1. Set underline color of EditText
+            //Set underline color of EditText
             Drawable background = editTextNote.getBackground().mutate();
             if (background instanceof GradientDrawable) {
                 ((GradientDrawable) background).setColor(animatedColor);
@@ -363,19 +358,20 @@ public class AddNoteActivity extends AppCompatActivity {
                 // Fallback: use tint if not a drawable with color
                 editTextNote.setBackgroundTintList(ColorStateList.valueOf(animatedColor));
             }
-            // 2. Set TextView text color
+            //Set TextView text color
             priorityTextView.setTextColor(animatedColor);
 
-            // 3. Set Save Button background tint (if you use material or drawable-based background)
+            //Set Save Button background tint
             saveButton.setBackgroundTintList(ColorStateList.valueOf(animatedColor));
 
-            // New: Update status bar color
+            //Update status bar color
             getWindow().setStatusBarColor(animatedColor);
             getWindow().setNavigationBarColor(animatedColor);
 
             // Adjust status bar icons for better visibility
             setStatusBarIconColor(animatedColor);
 
+            //QR background painting
             Drawable qrBack = qrImage.getBackground();
             if (qrBack instanceof GradientDrawable) {
                 ((GradientDrawable) qrBack).setColor(animatedColor);
@@ -436,10 +432,6 @@ public class AddNoteActivity extends AppCompatActivity {
     }
 
     private void clearDraft() {
-        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-                .edit()
-                .remove(draftKey + "_text")
-                .remove(draftKey + "_priority")
-                .apply();
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().remove(draftKey + "_text").remove(draftKey + "_priority").apply();
     }
 }
