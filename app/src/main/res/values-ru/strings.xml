@@ -14,5 +14,5 @@
     <string name="add_new_note_button_label">Добавить новую заметку\n</string>
     <string name="priority">Важность:</string>
     <string name="donate_qr_code">Поддержите разработку 😊</string>
-    <string name="support_the_app">Поддержите разработку 😊 Отсканируйте или нажмите , чтобы задонатить.</string>
+    <string formatted="true" name="support_the_app"> <small><![CDATA[Поддержите разработку 😊 Отсканируйте или нажмите , чтобы задонатить.]]></small></string>
 </resources>
