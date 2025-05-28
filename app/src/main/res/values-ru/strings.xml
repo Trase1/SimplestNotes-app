@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="enter_note">Введите заметку:</string>
+    <string name="enter_note">Введите заметку…</string>
     <string name="low">Низкая</string>
     <string name="medium">Средняя</string>
     <string name="high">Высокая</string>
