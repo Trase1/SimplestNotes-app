@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.TodoList"
+        android:theme="@style/Theme.SimplestNotes"
         android:hardwareAccelerated="true"
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="33">
