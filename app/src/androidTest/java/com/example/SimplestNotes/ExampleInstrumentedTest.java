@@ -1,14 +1,14 @@
 package com.example.SimplestNotes;
 
+import static org.junit.Assert.assertEquals;
+
 import android.content.Context;
 
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.*;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -23,4 +23,13 @@ public class ExampleInstrumentedTest {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         assertEquals("com.example.SimplestNotes", appContext.getPackageName());
     }
+
+    @Test
+    public void newNote() {
+        // Context of the app under test.
+        Note note = new Note("test", 1);
+        assertEquals("test", note.getText());
+        assertEquals(1, note.getPriority());
+    }
+
 }
