@@ -14,6 +14,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
     }
 
     buildTypes {
@@ -24,11 +25,16 @@ android {
                 "proguard-rules.pro"
             )
         }
+        getByName("debug") {
+            proguardFiles("proguard-rules.pro")
+        }
+        getByName("debug")
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    buildToolsVersion = "35.0.1"
 }
 
 dependencies {
@@ -39,6 +45,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.room)
     implementation(libs.core)
+    implementation(libs.test.core)
     annotationProcessor(libs.room.annotation.processor)
     implementation(libs.room.rxjava3)
     implementation(libs.rxandroid)
@@ -46,5 +53,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    testImplementation(libs.room.testing)
 
 }

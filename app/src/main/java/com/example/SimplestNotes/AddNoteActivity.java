@@ -151,7 +151,7 @@ public class AddNoteActivity extends AppCompatActivity {
     private void setupOnClickListeners() {
         saveButton.setOnClickListener(view -> saveNote());
         qrImage.setOnClickListener(v -> {
-            String url = "https://boosty.to/trase1/donate"; // Use your real link!
+            String url = getString(R.string.donate_link); // Use your real link!
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
             startActivity(i);
@@ -196,7 +196,7 @@ public class AddNoteActivity extends AppCompatActivity {
             if (editTextNote.getMaxHeight() != maxHeight && maxHeight > 0) {
                 editTextNote.setMaxHeight(maxHeight);
             }
-            mainLayout.requestLayout();
+            //mainLayout.requestLayout();
         });
     }
 
@@ -419,10 +419,10 @@ public class AddNoteActivity extends AppCompatActivity {
 
     private void restoreDraft() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        String draft = prefs.getString(draftKey + "_text", null);
+        String draft = prefs.getString(draftKey + "_text", "");
         int draftPriority = prefs.getInt(draftKey + "_priority", -1);
 
-        if (draft != null && !draft.isEmpty()) {
+        if (/*draft != null && */!draft.isEmpty()) {
             editTextNote.setText(draft);
             editTextNote.setSelection(draft.length());
         }

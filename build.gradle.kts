@@ -2,3 +2,4 @@
 plugins {
     alias(libs.plugins.android.application) apply false
 }
+val defaultTestApplicationId by extra("com.example.SimplestNotes")
