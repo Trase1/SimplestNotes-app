@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
+    android:fillViewport="true"
     android:orientation="vertical"
-    tools:context=".AddNoteActivity"
-    android:fillViewport="true">
+    tools:context=".AddNoteActivity">
 
     <!-- Top Guideline for scrollable area -->
     <androidx.constraintlayout.widget.Guideline
@@ -32,147 +31,141 @@
         android:id="@+id/editTextNote"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:minHeight="48dp"
         android:layout_margin="12dp"
         android:autofillHints=""
-        android:inputType="textMultiLine"
-        android:text=""
         android:gravity="top"
         android:hint="@string/enter_note"
+        android:inputType="textMultiLine"
+        android:minHeight="48dp"
         android:overScrollMode="ifContentScrolls"
-        android:scrollbars="vertical"
         android:saveEnabled="false"
-        app:layout_constraintTop_toTopOf="@id/topGuideline"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/buttonsContainer"
+        android:scrollbars="vertical"
+        android:text=""
         app:layout_constrainedHeight="true"
-        />
+        app:layout_constraintBottom_toTopOf="@id/buttonsContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/topGuideline" />
 
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:id="@+id/buttonsContainer"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    app:layout_constraintTop_toBottomOf="@id/editTextNote"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    >
-
-    <TextView
-        android:id="@+id/priorityTextView"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/buttonsContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:text="@string/priority"
-        android:textSize="16sp"
-        android:textColor="@color/selected_low_priority"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
-
-    <RadioGroup
-        android:id="@+id/radioGroup"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:orientation="horizontal"
-        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/priorityTextView"
-        >
-
-        <RadioButton
-            android:id="@+id/radioButtonLow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:checked="true"
-            android:background="@drawable/low_radio_button_background"
-            android:textColor="@color/white"
-            android:padding="8dp"
-            android:text="@string/low"
-            android:textSize="16sp"
-            android:textAlignment="center"
-            android:button="@null"
-            />
-
-        <RadioButton
-            android:id="@+id/radioButtonMedium"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@android:color/holo_orange_light"
-            android:textColor="@color/white"
-            android:padding="8dp"
-            android:text="@string/medium"
-            android:textSize="16sp"
-            android:textAlignment="center"
-            android:button="@null"/>
-
-        <RadioButton
-            android:id="@+id/radioButtonHigh"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/high_radio_button_background"
-            android:textColor="@color/white"
-            android:padding="8dp"
-            android:text="@string/high"
-            android:textSize="16sp"
-            android:textAlignment="center"
-            android:button="@null"/>
-
-    </RadioGroup>
-
-    <Button
-        android:id="@+id/saveButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:textAllCaps="true"
-        android:text="@string/save"
-        android:background="@drawable/note_background"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroup"
-        />
-
-    <LinearLayout
-        android:id="@+id/qrDonationContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="8dp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/saveButton">
-
-        <ImageView
-            android:id="@+id/qrDonation"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:contentDescription="@string/donate_qr_code"
-            android:src="@drawable/qr_donate"
-            android:background="@drawable/qr_background"/>
+        app:layout_constraintTop_toBottomOf="@id/editTextNote">
 
         <TextView
-            android:id="@+id/donateText"
+            android:id="@+id/priorityTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="6dp"
+            android:text="@string/priority"
+            android:textColor="@color/selected_low_priority"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/priorityTextView">
+
+            <RadioButton
+                android:id="@+id/radioButtonLow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/low_radio_button_background"
+                android:button="@null"
+                android:checked="true"
+                android:padding="8dp"
+                android:text="@string/low"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <RadioButton
+                android:id="@+id/radioButtonMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:color/holo_orange_light"
+                android:button="@null"
+                android:padding="8dp"
+                android:text="@string/medium"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <RadioButton
+                android:id="@+id/radioButtonHigh"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/high_radio_button_background"
+                android:button="@null"
+                android:padding="8dp"
+                android:text="@string/high"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/note_background"
+            android:text="@string/save"
+            android:textAllCaps="true"
+            app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+
+        <LinearLayout
+            android:id="@+id/qrDonationContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="@string/support_the_app"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="14sp" />
-    </LinearLayout>
+            android:layout_marginTop="24dp"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/saveButton">
+
+            <ImageView
+                android:id="@+id/qrDonation"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@drawable/qr_background"
+                android:contentDescription="@string/donate_qr_code"
+                android:src="@drawable/qr_donate" />
+
+            <TextView
+                android:id="@+id/donateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/support_the_app"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
