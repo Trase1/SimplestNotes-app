@@ -1,37 +1,44 @@
 [versions]
 agp = "8.10.1"
 junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
+androidx-junit = "1.2.1"
+espresso = "3.6.1"
 appcompat = "1.7.1"
 material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
-room_version = "2.7.1"
-rxandroid_version="3.0.2"
-rxjava_version= "3.1.10"
+room = "2.7.1"
+rxandroid = "3.0.2"
+rxjava = "3.1.10"
 core = "1.16.0"
-coreVersion = "1.6.1"
+test-core = "1.6.1"
 
 [libraries]
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+
+# AndroidX Core
+core = { group = "androidx.core", name = "core", version.ref = "core" }
+
+# UI Libraries
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-room = {group = "androidx.room", name = "room-runtime", version.ref = "room_version"}
-room-annotation-processor = {group="androidx.room", name = "room-compiler", version.ref ="room_version"}
-room-rxjava3 = {group = "androidx.room", name = "room-rxjava3", version.ref ="room_version"}
 
-room-testing = { module = "androidx.room:room-testing", version.ref = "room_version" }
-rxandroid = {group = "io.reactivex.rxjava3", name = "rxandroid", version.ref ="rxandroid_version"}
-rxjava = {group = "io.reactivex.rxjava3", name = "rxjava", version.ref ="rxjava_version"}
-core = { group = "androidx.core", name = "core", version.ref = "core" }
-test-core = { group = "androidx.test", name = "core", version.ref = "coreVersion" }
+# Room DB
+room = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-annotation-processor = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-rxjava3 = { group = "androidx.room", name = "room-rxjava3", version.ref = "room" }
+room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
 
+# RxJava
+rxandroid = { group = "io.reactivex.rxjava3", name = "rxandroid", version.ref = "rxandroid" }
+rxjava = { group = "io.reactivex.rxjava3", name = "rxjava", version.ref = "rxjava" }
+
+# Testing
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-junit" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
+test-core = { group = "androidx.test", name = "core", version.ref = "test-core" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-
