@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         setupDatabase();
         onEdit();
         setupRecyclerView();
-
+        GoatTracker.trackEvent("/app-opened");
     }
 
     private void onEdit() {

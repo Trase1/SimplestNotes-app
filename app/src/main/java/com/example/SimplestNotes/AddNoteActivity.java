@@ -15,6 +15,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -151,6 +152,7 @@ public class AddNoteActivity extends AppCompatActivity {
     private void setupOnClickListeners() {
         saveButton.setOnClickListener(view -> saveNote());
         qrImage.setOnClickListener(v -> {
+            GoatTracker.trackEvent("/qr-clicked");
             String url = getString(R.string.donate_link); // Use your real link!
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
@@ -281,6 +283,8 @@ public class AddNoteActivity extends AppCompatActivity {
                 }
             });
         }
+        Log.d("GoatCounter", "Sending event: /note-created");
+        GoatTracker.trackEvent("/note-created");
     }
 
     private int getPriority() {

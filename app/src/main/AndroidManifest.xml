@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,7 +16,8 @@
         android:hardwareAccelerated="true"
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="33">
-        <activity
+
+    <activity
             android:name=".AddNoteActivity"
             android:exported="false"
             android:configChanges="screenSize"
