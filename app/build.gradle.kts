@@ -19,7 +19,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -27,6 +28,7 @@ android {
         }
         getByName("debug") {
             proguardFiles("proguard-rules.pro")
+            versionNameSuffix = "-debug"
         }
         getByName("debug")
     }
@@ -35,6 +37,15 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildToolsVersion = "35.0.1"
+
+    lint {
+        checkReleaseBuilds = true
+        abortOnError = true
+    }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
