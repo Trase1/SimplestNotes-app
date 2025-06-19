@@ -1,3 +1,5 @@
+import com.android.build.api.variant.ApplicationVariant
+
 plugins {
     alias(libs.plugins.android.application)
 }
@@ -10,8 +12,8 @@ android {
         applicationId = "com.example.SimplestNotes"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -65,6 +67,19 @@ android {
     }
 
 }
+
+android.applicationVariants.all {
+    val variant = this
+
+    outputs.all {
+        val appName = "SimplestNotes"
+        val version = variant.versionName
+        val buildType = variant.buildType.name
+        val newApkName = "${appName}_v${version}_${buildType}.apk"
+        (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName = newApkName
+    }
+}
+
 
 dependencies {
 
