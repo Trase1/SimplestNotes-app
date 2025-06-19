@@ -18,13 +18,13 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.0" />
 
-    <!-- Bottom Guideline to limit EditText height -->
+    <!-- Bottom limit for EditText height before hiding lower UI (like QR) -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/bottomGuideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.8" />
+        app:layout_constraintGuide_percent="0.85" />
 
 
     <EditText
