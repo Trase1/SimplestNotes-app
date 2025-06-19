@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -29,6 +28,7 @@ import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final int cornerRadius = 8;
     private FloatingActionButton buttonAddNote;
     private RecyclerView recyclerViewNotes;
     private NotesAdapter notesAdapter;
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupEdgeToEdge();
+        initLayoutWithInsets();
         initViews();
         setupDatabase();
         onEdit();
@@ -55,20 +55,21 @@ public class MainActivity extends AppCompatActivity {
         editNoteLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        Intent data = result.getData();
-                        int id = data.getIntExtra(EXTRA_NOTE_ID, -1);
-                        String text = data.getStringExtra(EXTRA_NOTE_TEXT);
-                        int priority = data.getIntExtra(EXTRA_NOTE_PRIORITY, 1);
-                        if (id != -1) {
-                            Note updatedNote = new Note(id, text, priority);
-                            executor.execute(() -> {
-                                noteDatabase.notesDao().update(updatedNote);
-                                showNotes();
-                            });
 
-                        }
-                    }
+                    if (result.getResultCode() != RESULT_OK || result.getData() == null) return;
+
+                    Intent data = result.getData();
+                    int id = data.getIntExtra(EXTRA_NOTE_ID, -1);
+                    if (id == -1) return;
+
+                    String text = data.getStringExtra(EXTRA_NOTE_TEXT);
+                    int priority = data.getIntExtra(EXTRA_NOTE_PRIORITY, 1);
+
+                    Note updatedNote = new Note(id, text, priority);
+                    executor.execute(() -> {
+                        noteDatabase.notesDao().update(updatedNote);
+                        showNotes();
+                    });
                 }
         );
     }
@@ -169,8 +170,7 @@ public class MainActivity extends AppCompatActivity {
         noteDatabase = NoteDatabase.getInstance(getApplication());
     }
 
-    private void setupEdgeToEdge() {
-        EdgeToEdge.enable(this);
+    private void initLayoutWithInsets() {
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
             // Create background with rounded corners
             GradientDrawable shape = new GradientDrawable();
             shape.setShape(GradientDrawable.RECTANGLE);
-            shape.setCornerRadius(dpToPx(8)); // 8dp radius
+            shape.setCornerRadius(dpToPx()); // 8dp radius
             shape.setColor(ContextCompat.getColor(this, R.color.white));
 
             // Set background
@@ -204,10 +204,10 @@ public class MainActivity extends AppCompatActivity {
         noteDeletedSnack.show();
     }
 
-    private float dpToPx(int dp) {
+    private float dpToPx() {
         return TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
-                dp,
+                MainActivity.cornerRadius,
                 getResources().getDisplayMetrics()
         );
     }

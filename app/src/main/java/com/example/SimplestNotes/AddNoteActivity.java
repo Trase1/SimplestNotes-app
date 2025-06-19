@@ -53,6 +53,7 @@ public class AddNoteActivity extends AppCompatActivity {
     public static final int PRIORITY_HIGH = 2;
     private static final String PREFS_NAME = "note_drafts";
     private int editingNoteId = -1;
+    private static final float CORNER_RADIUS_DP = 8f;
     private String draftKey;
 
     private EditText editTextNote;
@@ -66,6 +67,7 @@ public class AddNoteActivity extends AppCompatActivity {
     private View bottomGuideline;
     private View buttonsContainer;
     private ImageView qrImage;
+    private boolean noteSaved = false;
 
 
     private Button saveButton;
@@ -75,54 +77,42 @@ public class AddNoteActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         initViews();
-        setupDynamicEditTextMaxHeight(); //setting a max height to editText so the buttons and text stay on the screen
-        setupEditTextBehavior(); //adding smooth transitions
+        setupUI();
         setupDatabase();
         setupEdgeToEdge();
+        initNoteContent();
+    }
+
+    private void setupUI() {
+        setupDynamicEditTextMaxHeight(); //setting a max height to editText so the buttons and text stay on the screen
+        setupEditTextBehavior(); //adding smooth transitions
         setupOnClickListeners();
-        checkedUncheckedRadioButton(); //style interface according to chosen priority
-        onBack();
-        onRestore();
-        onEdit();
+        setupPrioritySelector(); //style interface according to chosen priority
+        setupOnBackPressHandler();
     }
 
-    private void onRestore() {
+    private void initNoteContent() {
         Intent intent = getIntent();
         if (intent.hasExtra(MainActivity.EXTRA_NOTE_ID)) {
-            int noteId = intent.getIntExtra(MainActivity.EXTRA_NOTE_ID, -1);
-            executor.execute(() -> {
-                Note note = noteDatabase.notesDao().getNoteById(noteId);
-                setupDraftKey(note);
-            });
-        }
-        restoreDraft();
-    }
-
-    private void onEdit() {
-        Intent intent = getIntent();
-        if (intent.hasExtra(MainActivity.EXTRA_NOTE_ID)) {
-            // Edit mode
+            // EDIT mode
             editingNoteId = intent.getIntExtra(MainActivity.EXTRA_NOTE_ID, -1);
             String text = intent.getStringExtra(MainActivity.EXTRA_NOTE_TEXT);
-            int priority = intent.getIntExtra(MainActivity.EXTRA_NOTE_PRIORITY, 1);
+            int priority = intent.getIntExtra(MainActivity.EXTRA_NOTE_PRIORITY, PRIORITY_LOW);
 
+            draftKey = "draft_note_" + editingNoteId;
             editTextNote.setText(text);
+            setPriorityUI(priority);
 
-            // Set correct radio button for priority
-            if (priority == 0) {
-                radioGroup.check(R.id.radioButtonLow);
-            } else if (priority == 1) {
-                radioGroup.check(R.id.radioButtonMedium);
-            } else if (priority == 2) {
-                radioGroup.check(R.id.radioButtonHigh);
-            }
+        } else {
+            // NEW note
+            draftKey = "draft_new_note";
+            restoreDraft();
         }
     }
 
-    private void onBack() {
+    private void setupOnBackPressHandler() {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -137,6 +127,7 @@ public class AddNoteActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        if (noteSaved) return;
         String text = editTextNote.getText().toString();
         int priority = getPriority();
 
@@ -198,7 +189,6 @@ public class AddNoteActivity extends AppCompatActivity {
             if (editTextNote.getMaxHeight() != maxHeight && maxHeight > 0) {
                 editTextNote.setMaxHeight(maxHeight);
             }
-            //mainLayout.requestLayout();
         });
     }
 
@@ -233,7 +223,7 @@ public class AddNoteActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         ViewCompat.setOnApplyWindowInsetsListener(mainLayout, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
 
             return insets;
         });
@@ -251,40 +241,55 @@ public class AddNoteActivity extends AppCompatActivity {
     }
 
     private void saveNote() {
+
         String text = editTextNote.getText().toString().trim();
         int priority = getPriority();
-        //edit note
-        if (editingNoteId != -1) {
-            Intent data = new Intent();
-            data.putExtra(MainActivity.EXTRA_NOTE_TEXT, text);
-            data.putExtra(MainActivity.EXTRA_NOTE_PRIORITY, priority);
-            data.putExtra(MainActivity.EXTRA_NOTE_ID, editingNoteId);
-            setResult(RESULT_OK, data);
-            finish();
 
-        }
-        //new note
-        else if (text.isEmpty()) {
-            Toast.makeText(this, R.string.empty_note_toast, Toast.LENGTH_SHORT).show();
+        if (isNoteEmpty(text)) return;
+
+        if (editingNoteId != -1) {
+            updateNote(text, priority);
         } else {
-            Note note = new Note(text, priority);
-            executor.execute(() -> {
-                try {
-                    noteDatabase.notesDao().add(note);
-                    runOnUiThread(() -> {
-                        Toast.makeText(this, R.string.note_added, Toast.LENGTH_SHORT).show();
-                        clearDraft();
-                        editTextNote.setText("");
-                        setPriorityUI(PRIORITY_LOW);
-                        finish();
-                    });
-                } catch (Exception e) {
-                    runOnUiThread(() -> Toast.makeText(this, R.string.error_adding_a_note, Toast.LENGTH_SHORT).show());
-                }
-            });
+            createNewNote(text, priority);
         }
-        Log.d("GoatCounter", "Sending event: /note-created");
-        GoatTracker.trackEvent("/note-created");
+    }
+
+    private void updateNote(String text, int priority) {
+        Intent data = new Intent();
+        data.putExtra(MainActivity.EXTRA_NOTE_TEXT, text);
+        data.putExtra(MainActivity.EXTRA_NOTE_PRIORITY, priority);
+        data.putExtra(MainActivity.EXTRA_NOTE_ID, editingNoteId);
+        setResult(RESULT_OK, data);
+        GoatTracker.trackEvent("/note-updated");
+        finish();
+    }
+
+    private void createNewNote(String text, int priority) {
+        Note note = new Note(text, priority);
+        executor.execute(() -> {
+            try {
+                noteDatabase.notesDao().add(note);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, R.string.note_added, Toast.LENGTH_SHORT).show();
+                    noteSaved = true;
+                    clearDraft();
+                    setPriorityUI(PRIORITY_LOW);
+                    GoatTracker.trackEvent("/note-created");
+                    finish();
+                });
+            } catch (Exception e) {
+                Log.e("AddNoteActivity", "Error adding note", e);
+                runOnUiThread(() -> Toast.makeText(this, R.string.error_adding_a_note, Toast.LENGTH_SHORT).show());
+            }
+        });
+    }
+
+    private boolean isNoteEmpty(String text) {
+        if (text.isEmpty()) {
+            runOnUiThread(() -> Toast.makeText(this, R.string.empty_note_toast, Toast.LENGTH_SHORT).show());
+            return true;
+        }
+        return false;
     }
 
     private int getPriority() {
@@ -309,7 +314,7 @@ public class AddNoteActivity extends AppCompatActivity {
         button.setBackground(background);
     }
 
-    private void checkedUncheckedRadioButton() {
+    private void setupPrioritySelector() {
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             int priority = PRIORITY_LOW;
             if (radioButtonMedium.getId() == checkedId) priority = PRIORITY_MEDIUM;
@@ -401,7 +406,7 @@ public class AddNoteActivity extends AppCompatActivity {
 
     @NonNull
     private float[] getRadii(int i, RadioButton[] buttons) {
-        float radius = 8 * getResources().getDisplayMetrics().density;
+        float radius = CORNER_RADIUS_DP * getResources().getDisplayMetrics().density;
         float[] radii;
 
         if (i == 0)
@@ -413,20 +418,12 @@ public class AddNoteActivity extends AppCompatActivity {
         return radii;
     }
 
-    private void setupDraftKey(Note note) {
-        if (note != null && note.getId() != 0) {
-            draftKey = "draft_note_" + note.getId(); //editing
-        } else {
-            draftKey = "draft_new_note"; //adding
-        }
-    }
-
     private void restoreDraft() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         String draft = prefs.getString(draftKey + "_text", "");
         int draftPriority = prefs.getInt(draftKey + "_priority", -1);
 
-        if (/*draft != null && */!draft.isEmpty()) {
+        if (!draft.isEmpty()) {
             editTextNote.setText(draft);
             editTextNote.setSelection(draft.length());
         }
