@@ -37,7 +37,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import org.jetbrains.annotations.Contract;
@@ -81,7 +80,7 @@ public class AddNoteActivity extends AppCompatActivity {
         initViews();
         setupUI();
         setupDatabase();
-        setupEdgeToEdge();
+        initInsets();
         initNoteContent();
     }
 
@@ -219,11 +218,12 @@ public class AddNoteActivity extends AppCompatActivity {
         });
     }
 
-    private void setupEdgeToEdge() {
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+    private void initInsets() {
+        //WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
         ViewCompat.setOnApplyWindowInsetsListener(mainLayout, (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
 
             return insets;
         });
