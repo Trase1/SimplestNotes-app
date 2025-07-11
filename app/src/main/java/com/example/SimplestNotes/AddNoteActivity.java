@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -85,7 +86,7 @@ public class AddNoteActivity extends AppCompatActivity {
     }
 
     private void setupUI() {
-        setupDynamicEditTextMaxHeight(); //setting a max height to editText so the buttons and text stay on the screen
+        // setupDynamicEditTextMaxHeight(); //setting a max height to editText so the buttons and text stay on the screen
         setupEditTextBehavior(); //adding smooth transitions
         setupOnClickListeners();
         setupPrioritySelector(); //style interface according to chosen priority
@@ -159,7 +160,7 @@ public class AddNoteActivity extends AppCompatActivity {
         radioButtonMedium = findViewById(R.id.radioButtonMedium);
         radioButtonHigh = findViewById(R.id.radioButtonHigh);
         saveButton = findViewById(R.id.saveButton);
-        bottomGuideline = findViewById(R.id.bottomGuideline);
+        //bottomGuideline = findViewById(R.id.bottomGuideline);
         mainLayout = findViewById(R.id.main);
         buttonsContainer = findViewById(R.id.buttonsContainer);
         qrImage = findViewById(R.id.qrDonation);
@@ -215,6 +216,24 @@ public class AddNoteActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 editTextNote.requestLayout();
             }
+        });
+
+        editTextNote.post(() -> {
+            editTextNote.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+                int[] location = new int[2];
+                editTextNote.getLocationOnScreen(location);
+                int editTextBottom = location[1] + editTextNote.getHeight();
+
+                int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
+                int guidelineY = (int) (0.85f * screenHeight);
+
+                View qrContainer = findViewById(R.id.qrDonationContainer);
+                if (editTextBottom >= guidelineY - 100) {
+                    qrContainer.setVisibility(View.GONE);
+                } else {
+                    qrContainer.setVisibility(View.VISIBLE);
+                }
+            });
         });
     }
 
