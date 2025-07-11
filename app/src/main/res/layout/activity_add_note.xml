@@ -2,91 +2,68 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:fillViewport="true"
-    android:orientation="vertical"
+    android:id="@+id/main"
     tools:context=".AddNoteActivity">
 
-    <!-- Top Guideline for scrollable area -->
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/topGuideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.0" />
-
-    <!-- Bottom limit for EditText height before hiding lower UI (like QR) -->
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/bottomGuideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.85" />
-
-
+    <!-- Editable text area -->
     <EditText
         android:id="@+id/editTextNote"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        android:autofillHints=""
+        android:minLines="1"
         android:gravity="top"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="4dp"
         android:hint="@string/enter_note"
         android:inputType="textMultiLine"
-        android:minHeight="48dp"
         android:overScrollMode="ifContentScrolls"
-        android:saveEnabled="false"
         android:scrollbars="vertical"
-        android:text=""
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@id/buttonsContainer"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/topGuideline" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintBottom_toTopOf="@id/buttonsContainer" />
 
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Priority controls + Save button -->
+    <LinearLayout
         android:id="@+id/buttonsContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="vertical"
+        android:gravity="top"
+        android:layout_margin="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editTextNote">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editTextNote"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
             android:id="@+id/priorityTextView"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginBottom="6dp"
             android:text="@string/priority"
             android:textColor="@color/selected_low_priority"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:textSize="16sp" />
 
         <RadioGroup
             android:id="@+id/radioGroup"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
             android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/priorityTextView">
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
 
+            <!-- radio buttons exactly as before -->
             <RadioButton
                 android:id="@+id/radioButtonLow"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/low_radio_button_background"
@@ -100,7 +77,7 @@
 
             <RadioButton
                 android:id="@+id/radioButtonMedium"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@android:color/holo_orange_light"
@@ -113,7 +90,7 @@
 
             <RadioButton
                 android:id="@+id/radioButtonHigh"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/high_radio_button_background"
@@ -123,51 +100,46 @@
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
-
         </RadioGroup>
 
         <Button
             android:id="@+id/saveButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginBottom="8dp"
             android:background="@drawable/note_background"
             android:text="@string/save"
-            android:textAllCaps="true"
-            app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+            android:textAllCaps="true" />
+    </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/qrDonationContainer"
+    <!-- QR block: slides off when space runs out -->
+    <LinearLayout
+        android:id="@+id/qrDonationContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/buttonsContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/qrDonation"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/qr_donate"
+            android:background="@drawable/qr_background"
+            android:contentDescription="@string/donate_qr_code" />
+
+        <TextView
+            android:id="@+id/donateText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:background="@android:color/transparent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/saveButton">
-
-            <ImageView
-                android:id="@+id/qrDonation"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:background="@drawable/qr_background"
-                android:contentDescription="@string/donate_qr_code"
-                android:src="@drawable/qr_donate" />
-
-            <TextView
-                android:id="@+id/donateText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@string/support_the_app"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+            android:layout_marginTop="6dp"
+            android:text="@string/support_the_app"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
