@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -160,7 +159,6 @@ public class AddNoteActivity extends AppCompatActivity {
         radioButtonMedium = findViewById(R.id.radioButtonMedium);
         radioButtonHigh = findViewById(R.id.radioButtonHigh);
         saveButton = findViewById(R.id.saveButton);
-        //bottomGuideline = findViewById(R.id.bottomGuideline);
         mainLayout = findViewById(R.id.main);
         buttonsContainer = findViewById(R.id.buttonsContainer);
         qrImage = findViewById(R.id.qrDonation);
@@ -169,27 +167,6 @@ public class AddNoteActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
-    }
-
-    private void setupDynamicEditTextMaxHeight() {
-        // Dynamically set maxHeight based on guideline & keyboard
-
-        mainLayout.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-
-            Rect r = new Rect();
-            mainLayout.getWindowVisibleDisplayFrame(r);
-            int[] location = new int[2];
-            editTextNote.getLocationOnScreen(location);
-            int editTextTop = location[1];
-            int maxHeight = r.bottom - editTextTop;
-            int guidelineY = bottomGuideline.getY() > 0 ? (int) bottomGuideline.getY() : r.bottom;
-            maxHeight = Math.min(maxHeight, guidelineY - editTextTop);
-
-            // Only update if changed, to avoid unnecessary re-layouts
-            if (editTextNote.getMaxHeight() != maxHeight && maxHeight > 0) {
-                editTextNote.setMaxHeight(maxHeight);
-            }
-        });
     }
 
     private void setupEditTextBehavior() {
@@ -238,7 +215,6 @@ public class AddNoteActivity extends AppCompatActivity {
     }
 
     private void initInsets() {
-        //WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         ViewCompat.setOnApplyWindowInsetsListener(mainLayout, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
