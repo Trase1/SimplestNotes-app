@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId = "com.example.SimplestNotes"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 3
         versionName = "1.0.2"
 
