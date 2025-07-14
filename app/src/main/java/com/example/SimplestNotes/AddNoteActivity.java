@@ -7,9 +7,11 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,6 +20,7 @@ import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -63,7 +66,6 @@ public class AddNoteActivity extends AppCompatActivity {
     private RadioButton radioButtonLow;
     private RadioButton radioButtonMedium;
     private RadioButton radioButtonHigh;
-    private View bottomGuideline;
     private View buttonsContainer;
     private ImageView qrImage;
     private boolean noteSaved = false;
@@ -195,23 +197,21 @@ public class AddNoteActivity extends AppCompatActivity {
             }
         });
 
-        editTextNote.post(() -> {
-            editTextNote.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-                int[] location = new int[2];
-                editTextNote.getLocationOnScreen(location);
-                int editTextBottom = location[1] + editTextNote.getHeight();
+        editTextNote.post(() -> editTextNote.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            int[] location = new int[2];
+            editTextNote.getLocationOnScreen(location);
+            int editTextBottom = location[1] + editTextNote.getHeight();
 
-                int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
-                int guidelineY = (int) (0.85f * screenHeight);
+            int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
+            int guidelineY = (int) (0.85f * screenHeight);
 
-                View qrContainer = findViewById(R.id.qrDonationContainer);
-                if (editTextBottom >= guidelineY - 100) {
-                    qrContainer.setVisibility(View.GONE);
-                } else {
-                    qrContainer.setVisibility(View.VISIBLE);
-                }
-            });
-        });
+            View qrContainer = findViewById(R.id.qrDonationContainer);
+            if (editTextBottom >= guidelineY - 100) {
+                qrContainer.setVisibility(View.GONE);
+            } else {
+                qrContainer.setVisibility(View.VISIBLE);
+            }
+        }));
     }
 
     private void initInsets() {
@@ -307,6 +307,9 @@ public class AddNoteActivity extends AppCompatActivity {
         background.setColor(color);
         background.setCornerRadii(radii);
         button.setBackground(background);
+
+        button.setTextColor(
+                ContextCompat.getColorStateList(this, R.color.priority_text));
     }
 
     private void setupPrioritySelector() {
@@ -386,17 +389,32 @@ public class AddNoteActivity extends AppCompatActivity {
     }
 
     private void setStatusBarIconColor(@ColorInt int backgroundColor) {
-        // Calculate appropriate icon color (light/dark)
-        boolean isDark = ColorUtils.calculateLuminance(backgroundColor) < 0.5;
+        boolean isNight =
+                (getResources().getConfiguration().uiMode
+                        & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        double contrastWithWhite = ColorUtils.calculateContrast(Color.WHITE, backgroundColor);
+        double contrastWithBlack = ColorUtils.calculateContrast(Color.BLACK, backgroundColor);
+        boolean useDarkIcons = !isNight && (contrastWithBlack >= contrastWithWhite);
 
-        View decorView = getWindow().getDecorView();
-        int flags = decorView.getSystemUiVisibility();
-        if (isDark) {
-            flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            WindowInsetsController c = getWindow().getInsetsController();
+            if (c != null) {
+                int lightFlag = WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS;
+
+                int appearance = useDarkIcons ? lightFlag : 0;   // ON or OFF
+                c.setSystemBarsAppearance(appearance, lightFlag);
+            }
         } else {
-            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            View decor = getWindow().getDecorView();
+            int flags = decor.getSystemUiVisibility();
+            int lightFlag = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+
+            flags = useDarkIcons ? (flags | lightFlag)   // dark icons
+                    : (flags & ~lightFlag);  // light icons
+            decor.setSystemUiVisibility(flags);
         }
-        decorView.setSystemUiVisibility(flags);
+
+
     }
 
     @NonNull

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- When the button is checked we want foreground that contrasts with its solid bg -->
+    <item android:state_checked="true" android:color="?attr/colorOnPrimary" />   <!-- day=black, night=white -->
+    <!-- Unchecked → transparent/white bg, so use default on-surface text -->
+    <item android:color="?attr/colorOnSurface" />
+</selector>
