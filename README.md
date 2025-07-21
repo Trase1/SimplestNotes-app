@@ -12,7 +12,7 @@ A clean, minimalistic Android app for quickly taking and organizing notes — wi
 
 ## 📦 Download
 
-📱 [Latest release APK](https://github.com/Trase1/SimplestNotes/releases/latest)
+📱 [Latest release APK](https://github.com/Trase1/SimplestNotes-app/releases/latest)
 
 To install:
 1. Download the `.apk` file
@@ -31,4 +31,4 @@ If you find the app useful, consider scanning the QR code inside the app to dona
 
 ## 📄 License
 
-Licensed under the [Apache 2.0 License](LICENSE)
+Licensed under the [MIT Licence](LICENSE)
