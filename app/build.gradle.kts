@@ -47,9 +47,6 @@ android {
         viewBinding = true
     }
 
-
-
-
     signingConfigs {
         create("release") {
             storeFile = file(project.property("RELEASE_STORE_FILE") as String)
@@ -91,6 +88,7 @@ dependencies {
     implementation(libs.room)
     implementation(libs.core)
     implementation(libs.test.core)
+    annotationProcessor(libs.room.annotation.processor)
     implementation(libs.room.rxjava3)
     implementation(libs.rxandroid)
     implementation(libs.rxjava)
