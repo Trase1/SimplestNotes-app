@@ -1,4 +1,4 @@
-package com.example.SimplestNotes;
+package com.traseapps.simplestNotes;
 
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;

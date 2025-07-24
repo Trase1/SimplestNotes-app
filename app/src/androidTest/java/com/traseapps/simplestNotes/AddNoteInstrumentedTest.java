@@ -1,4 +1,4 @@
-package com.example.SimplestNotes;
+package com.traseapps.simplestNotes;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;

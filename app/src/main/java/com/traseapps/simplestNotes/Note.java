@@ -1,4 +1,4 @@
-package com.example.SimplestNotes;
+package com.traseapps.simplestNotes;
 
 import androidx.room.Entity;
 import androidx.room.Ignore;

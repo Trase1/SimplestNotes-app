@@ -1,4 +1,4 @@
-package com.example.SimplestNotes;
+package com.traseapps.simplestNotes;
 
 import static org.junit.Assert.assertEquals;
 

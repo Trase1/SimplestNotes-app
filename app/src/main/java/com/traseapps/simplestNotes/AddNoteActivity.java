@@ -1,4 +1,4 @@
-package com.example.SimplestNotes;
+package com.traseapps.simplestNotes;
 
 import android.animation.ValueAnimator;
 import android.content.Context;

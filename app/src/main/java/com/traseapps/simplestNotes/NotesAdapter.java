@@ -1,4 +1,4 @@
-package com.example.SimplestNotes;
+package com.traseapps.simplestNotes;
 
 import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;

@@ -1,4 +1,4 @@
-package com.example.SimplestNotes;
+package com.traseapps.simplestNotes;
 
 import androidx.room.Dao;
 import androidx.room.Delete;

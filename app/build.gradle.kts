@@ -3,11 +3,19 @@ plugins {
 }
 
 android {
-    namespace = "com.example.SimplestNotes"
+    namespace = "com.traseapps.simplestNotes"
     compileSdk = 36
 
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs (for IzzyOnDroid/F-Droid)
+        includeInApk = false
+        // Disables dependency metadata when building Android App Bundles (for Google Play)
+        includeInBundle = false
+    }
+
+
     defaultConfig {
-        applicationId = "com.example.SimplestNotes"
+        applicationId = "com.traseapps.simplestNotes"
         minSdk = 24
         targetSdk = 36
         versionCode = 3
@@ -70,7 +78,7 @@ android.applicationVariants.all {
     val variant = this
 
     outputs.all {
-        val appName = "SimplestNotes"
+        val appName = "com.traseapps.simplestNotes"
         val version = variant.versionName
         val buildType = variant.buildType.name
         val newApkName = "${appName}_v${version}_${buildType}.apk"

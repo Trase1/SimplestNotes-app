@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SimplestNotes"
+rootProject.name = "com.traseapps.simplestNotes"
 include(":app")
