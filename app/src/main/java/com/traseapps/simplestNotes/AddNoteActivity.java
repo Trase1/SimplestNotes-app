@@ -144,7 +144,7 @@ public class AddNoteActivity extends AppCompatActivity {
     private void setupOnClickListeners() {
         saveButton.setOnClickListener(view -> saveNote());
         qrImage.setOnClickListener(v -> {
-            GoatTracker.trackEvent("/qr-clicked");
+            //GoatTracker.trackEvent("/qr-clicked");
             String url = getString(R.string.donate_link); // Use your real link!
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
@@ -255,7 +255,7 @@ public class AddNoteActivity extends AppCompatActivity {
         data.putExtra(MainActivity.EXTRA_NOTE_PRIORITY, priority);
         data.putExtra(MainActivity.EXTRA_NOTE_ID, editingNoteId);
         setResult(RESULT_OK, data);
-        GoatTracker.trackEvent("/note-updated");
+        //GoatTracker.trackEvent("/note-updated");
         finish();
     }
 
@@ -269,7 +269,7 @@ public class AddNoteActivity extends AppCompatActivity {
                     noteSaved = true;
                     clearDraft();
                     setPriorityUI(PRIORITY_LOW);
-                    GoatTracker.trackEvent("/note-created");
+                    //GoatTracker.trackEvent("/note-created");
                     finish();
                 });
             } catch (Exception e) {
