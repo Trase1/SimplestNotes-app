@@ -10,6 +10,17 @@ A clean, minimalistic Android app for quickly taking and organizing notes — wi
 - 📤 Lightweight — fast and smooth
 - ❤️ Donate via QR code (optional)
 
+## 📸 Screenshots
+
+<p align="center">
+  <img src="1.png" alt="Screenshot 1" width="250"/>
+  <img src="2.png" alt="Screenshot 2" width="250"/>
+  <img src="3.png" alt="Screenshot 3" width="250"/>
+  <br/>
+  <img src="4.png" alt="Screenshot 4" width="250"/>
+  <img src="5.png" alt="Screenshot 5" width="250"/>
+</p>
+
 ## 📦 Download
 
 📱 [Latest release APK](https://github.com/Trase1/SimplestNotes-app/releases/latest)
