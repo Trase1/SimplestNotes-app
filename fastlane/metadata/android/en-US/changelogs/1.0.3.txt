@@ -1,0 +1,4 @@
+✔ Finalized app package name: now com.traseapps.simplestnotes  
+✔ Removed all analytics tracking (GoatCounter)  
+✔ Removed internet permission — app is now 100% offline  
+✔ Prepared for F-Droid / IzzyOnDroid release  
