@@ -78,7 +78,7 @@ android.applicationVariants.all {
     val variant = this
 
     outputs.all {
-        val appName = "com.traseapps.simplestNotes"
+        val appName = "simplestNotes"
         val version = variant.versionName
         val buildType = variant.buildType.name
         val newApkName = "${appName}_v${version}_${buildType}.apk"
