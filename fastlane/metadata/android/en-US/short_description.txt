@@ -1,0 +1,1 @@
+minimalistic app for quickly taking and organizing notes

@@ -1,0 +1,9 @@
+<i>Simplest Notes</i> is a clean, minimalistic Android app for quickly taking and organizing notes — without ads, clutter, or complexity.
+
+<b>Features:</b>
+
+- 📝 Create, edit, and delete notes
+- 🔴 Prioritize notes (Low, Medium, High)
+- 💾 Offline-first — no network required to use
+- 📤 Lightweight — fast and smooth
+- ❤️ Donate via QR code (optional)
