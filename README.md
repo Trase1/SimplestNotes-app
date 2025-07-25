@@ -32,6 +32,11 @@ To install:
 
 > Built for Android 7.0+ (API 24 and above)
 
+## 📦 Available on
+
+[![Download from IzzyOnDroid](https://img.shields.io/badge/IzzyOnDroid-SimplestNotes-blue?logo=fdroid&style=flat)](https://apt.izzysoft.de/packages/com.traseapps.simplestNotes)  
+[![Reproducible Builds](https://shields.rbtlog.dev/simple/com.traseapps.simplestNotes)](https://shields.rbtlog.dev/com.traseapps.simplestNotes)
+
 ## 💡 Why this app?
 
 Most note apps are bloated. **Simplest Notes** gives you exactly what you need — nothing more.
